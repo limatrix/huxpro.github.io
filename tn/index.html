@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html manifest="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>测试</title>
+	<!-- <link type="text/css" href="css/base.css" rel="Stylesheet" /> -->
+    <style type="text/css">
+
+		.container {
+		    padding-right: 18px;
+		    padding-left: 18px;
+		    margin-right: auto;
+		    margin-left: auto;
+		}
+    	.transparent-header {
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    background: transparent;
+		    box-shadow: none;
+		}
+		header {
+		    position: fixed;
+		    z-index: 14;
+		    /* padding: 20px 0; */
+		    background-color: rgba(248, 248, 248, 0.8);
+		    box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+		    -webkit-box-sizing: content-box;
+		    -moz-box-sizing: content-box;
+		    box-sizing: content-box;
+		    height: 40px;
+		    -webkit-transition: ease-out all 0.35s;
+		    -moz-transition: ease-out all 0.35s;
+		    -ms-transition: ease-out all 0.35s;
+		    -o-transition: ease-out all 0.35s;
+		    transition: ease-out all 0.35s;
+		}
+		body, header, main, footer, section {
+		    /*float: left;*/
+		    width: 100%;
+		}
+		article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+		    display: block;
+		}
+		body {
+		    font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
+		    font-size: 14px;
+		    color: #1a1a1a;
+		    background: #f6f6f6;
+		}
+
+		.nav {
+		    padding-left: 0;
+		    margin-bottom: 0;
+		    list-style: none;
+		}
+
+		.navbar-nav {
+		    float: left;
+		    margin: 0;
+		}
+
+		ul{
+		    display: block;
+		    list-style-type: disc;
+		    -webkit-margin-before: 1em;
+		    -webkit-margin-after: 1em;
+		    -webkit-margin-start: 0px;
+		    -webkit-margin-end: 0px;
+		    -webkit-padding-start: 40px;
+		}
+
+		.navbar-nav>li {
+		    float: left;
+		    position: relative;
+    		display: block;
+		}
+
+		.navbar-nav>li>a {
+		    position: relative;
+    		display: block;
+    		padding: 10px 15px 3px 0;
+    		cursor: pointer;
+		}
+		.navbar-nav.navbar-right>li>a{
+			padding: 10px 0 3px 15px;
+			cursor: pointer;
+		}
+		.navbar-right {
+		    float: right!important;
+		}
+
+		body
+		{ 
+		    /*background-image: url("home-01.jpg");
+    		background-repeat:no-repeat;
+			background-attachment:fixed;
+			background-position:center;*/
+			margin: 0;
+    		padding: 0;
+		}
+
+		.weui-cells {
+		    line-height: 1.47058824;
+		    font-size: 17px;
+		    overflow: hidden;
+		    position: relative;
+		}
+		.weui-cell {
+		    padding: 10px 15px;
+		    position: relative;
+		    display: -webkit-box;
+		    display: -webkit-flex;
+		    display: flex;
+		    -webkit-box-align: center;
+		    -webkit-align-items: center;
+		    align-items: center;
+		}
+
+		.weui-cells:before {
+		    content: " ";
+		    position: absolute;
+		    left: 0;
+		    top: 0;
+		    right: 0;
+		    height: 1px;
+		    border-top: 1px solid #e5e5e5;
+		    color: #e5e5e5;
+		    -webkit-transform-origin: 0 0;
+		    transform-origin: 0 0;
+		    -webkit-transform: scaleY(0.5);
+		    transform: scaleY(0.5);
+		    z-index: 2;
+		}
+		.weui-cell:before {
+		    content: " ";
+		    position: absolute;
+		    left: 0;
+		    top: 0;
+		    right: 0;
+		    height: 1px;
+		    border-top: 1px solid #e5e5e5;
+		    color: #e5e5e5;
+		    -webkit-transform-origin: 0 0;
+		    transform-origin: 0 0;
+		    -webkit-transform: scaleY(0.5);
+		    transform: scaleY(0.5);
+		    z-index: 2;
+		}
+
+		.weui-cells:after {
+		    content: " ";
+		    position: absolute;
+		    left: 0;
+		    bottom: 0;
+		    right: 0;
+		    height: 1px;
+		    border-bottom: 1px solid #e5e5e5;
+		    color: #e5e5e5;
+		    -webkit-transform-origin: 0 100%;
+		    transform-origin: 0 100%;
+		    -webkit-transform: scaleY(0.5);
+		    transform: scaleY(0.5);
+		    z-index: 2;
+		}
+		.main-container{padding-top:40px;}
+
+		.weui-cell__bd {
+		    -webkit-box-flex: 1;
+		    -webkit-flex: 1;
+		    flex: 1;
+		}
+
+		.weui-textarea {
+		    display: block;
+		    border: 0;
+		    resize: none;
+		    width: 100%;
+		    color: inherit;
+		    font-size: 1em;
+		    line-height: inherit;
+		    outline: 0;
+		}
+    </style>
+</head>
+
+<body>
+    <header class="transparent-header">
+    	<div class="container clearfix">
+    		<ul class="nav navbar-nav">
+    			<li>
+    				<a class="history-back">
+    					<svg t="1517816725296" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3291" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M896 544H250.4l242.4 242.4L448 832 173.6 557.6 128 512l45.6-45.6L448 192l45.6 45.6L250.4 480H896v64z" p-id="3292" fill="#1a1a1a"></path></svg>
+    				</a>
+    			</li>
+    			<li><a></a></li>
+    			<li>
+    				<a>
+    					<svg t="1517816960537" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3469" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M512.8 206.4L768 389.6V832H640V576H384v256H256V389.6l256.8-183.2m0-71.2c-6.4 0-12.8 1.6-18.4 5.6L104 419.2c-12.8 8.8-6.4 28.8 9.6 28.8H192v432c0 8.8 7.2 16 16 16h224c8.8 0 16-7.2 16-16V640h128v240c0 8.8 7.2 16 16 16h224c8.8 0 16-7.2 16-16V448h78.4c15.2 0 21.6-20 9.6-28.8L531.2 141.6c-5.6-4-12-6.4-18.4-6.4z" p-id="3470" fill="#1a1a1a"></path></svg>
+    				</a>
+    			</li>
+
+    		</ul>
+    		<ul class="nav navbar-nav navbar-right">
+    			<li>
+    				<a class="topic-edit">
+    					<svg t="1517817041446" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3647" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M896 480H544.8V128h-65.6v352H128v66.4h351.2V896h65.6V546.4H896z" p-id="3648" fill="#1a1a1a"></path></svg>
+    				</a>
+    				<a class="topic-save" style="display: none;">
+    					<svg t="1518487905233" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3682" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M704 128H192c-35.2 0-64 28.8-64 64v640c0 35.2 28.8 64 64 64h640c35.2 0 64-28.8 64-64V320L704 128zM256 256h320v128H256V256z m256 512c-70.4 0-128-57.6-128-128s57.6-128 128-128 128 57.6 128 128-57.6 128-128 128z" p-id="3683"></path></svg>
+    				</a>
+    			</li>
+    		</ul>
+    	</div>
+    </header>
+    <div class="main-container">
+
+    </div>
+    
+</body>
+<script type="text/html" id="topic-list" callback="initTopicListView" history="true">
+    <div class="weui-cells topic-list">
+    	<!-- <div class="weui-cell">
+         	我在网上也看到过相关文章说，小霸王公司的学习机可能是山寨或照搬了当年日本任天堂的FC主机带键盘的全套完整配件
+        </div> -->
+    </div>
+</script>
+<script type="text/html" id="item-list" callback="initItemListView" history="true">
+    <div class="weui-cells item-list">
+        
+    </div>
+</script>
+<script type="text/html" id="topic-edit" callback="" history="false">
+    <div class="weui-cell">
+        <div class="weui-cell__bd">
+            <textarea class="weui-textarea" placeholder="请输入文本" rows="20"></textarea>
+        </div>
+    </div>
+</script>
+
+<script src="http://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
+<script src="./ssp.js"></script>
+<script type="text/javascript">
+	var globalObjectCurPointer = null;
+	var globalObjectCurDeep    = 0;
+	var globalObjectCurSeq     = 0;
+
+    // 单击 - 进入下一级, 如果没有下一级, 进入下一级的编辑
+    // 滑动 - 显示出编辑和删除按钮
+    // 双击 - ......
+
+    var global_object = null;
+    function init_global_object() {
+        global_object = new Object();
+        global_object.id = 0;
+        global_object.text = "";
+        global_object.children = [];
+        // 从服务器拿来数据后需要再初始化children
+        set_cur_obj(global_object.children);
+    }
+
+    function set_cur_obj(obj) {
+        globalObjectCurPointer = obj;
+    }
+    function get_cur_obj() {
+        console.log(globalObjectCurPointer);
+        return globalObjectCurPointer;
+    }
+
+    function incr_page_deep() {
+        globalObjectCurDeep++;
+    }
+    function set_page_deep(deep) {
+        globalObjectCurDeep = deep;
+    }
+    function get_page_deep() {
+        return globalObjectCurDeep;
+    }
+
+    function get_new_id() {
+        var d = new Date();
+        return "" + d.getTime();
+    }
+
+    function get_obj_by_id(id) {
+        var lst = get_cur_obj();
+        var obj = null;
+        for (var i = 0; i < lst.length; i++) {
+            obj = lst[i];
+            if(obj.id == id) {
+                break;
+            }
+        }
+        return obj;
+    }
+
+	$(document).ready(function(){
+        init_global_object();
+
+		var ssp = new Ssp($(".main-container"));
+
+        // 显示第一页
+        ssp.go("topic-list", get_page_deep(), get_cur_obj());
+
+        // 显示编辑页面
+		$(".topic-edit").click(function(){
+			ssp.go("topic-edit")
+			showNavbarRightIcon("topic-save");
+		});
+
+        // 保存-更新缓存记录
+		$(".topic-save").click(function(){
+			var text = $(".weui-textarea").val();
+
+            var obj = new Object();
+            obj.id = get_new_id();
+            obj.text = text;
+            obj.children = [];
+
+            var cur_obj = get_cur_obj();
+            cur_obj.push(obj);
+
+            ssp.go("topic-list", get_page_deep(), cur_obj);
+
+			showNavbarRightIcon("topic-edit");
+		});
+
+        // 进入下一级
+		$(document).on("click", ".topic-item", function(){
+			console.log(this)
+			var id = $(this).attr("id");
+			var obj = get_obj_by_id(id);
+            if(obj) {
+                incr_page_deep();
+                set_cur_obj(obj.children);
+                ssp.go("topic-list", get_page_deep(), get_cur_obj());
+            } else {
+                console.log("index page, get topic failed")
+            }
+		});
+
+        $(".history-back").click(function(){
+            console.log("ssp back");
+            var obj = ssp.back();
+            console.log(obj);
+            if(obj) {
+                set_page_deep(obj.deep);
+                set_cur_obj(obj.pointer);
+            }
+            
+        });
+	});
+
+	function initTopicListView(children){
+		var str = '';
+        console.log(children);
+		for (var i = children.length - 1; i >= 0; i--) {
+			var id = children[i].id;
+			var text = children[i].text;
+			str += '<div class="weui-cell topic-item" id="' + id + '">' + text + '</div>';
+		}
+		$(".topic-list").empty();
+		$(".topic-list").append(str);
+	}
+
+    function initItemListView(children) {
+        var str = '';
+        console.log(children)
+        for (var i = children.length - 1; i >= 0; i--) {
+            var id = children[i].id;
+            var text = children[i].text;
+            str += '<div class="weui-cell item-item" id="' + id + '">' + text + '</div>';
+        }
+        $(".item-list").empty();
+        $(".item-list").append(str);
+    }
+
+	function showNavbarRightIcon(icon){
+		if(icon == "topic-edit")
+		{
+			$(".topic-save").hide();
+			$(".topic-edit").show();
+		}
+		if(icon == "topic-save")
+		{
+			$(".topic-edit").hide();
+			$(".topic-save").show();
+		}
+	}
+	// - 每个主题使用一个object, 把所有object放在array里
+	// - 只显示第一层主题时,所有相关全局变量都是默认值
+	// - 继续进入某一主题时,才给全局变量赋值
+
+	// - 增加第一层主题时, 新建一个object, 放在array里
+
+	var obj = 
+	{
+        "id": "10515fcdf066bf155",
+        "text": "地方地方",
+        "children": [
+        {
+            "id": "2da15fe1a11de001",
+            "text": "difang",
+            "children": [
+            {
+                "id": "30615fe1a1f3e113f",
+                "text": "sdadfasf",
+                "children": [
+                {
+                    "id": "19d15fe1a20f1313f",
+                    "text": "短短的",
+                },
+                {
+                    "id": "19d15fe1a20f1313f",
+                    "text": "短短的",
+                }]
+            }]
+        },
+        {
+            "id": "2da15fe1a11de001",
+            "text": "difang",
+            "children": [
+            {
+                "id": "30615fe1a1f3e113f",
+                "text": "sdadfasf",
+                "children": [
+                {
+                    "id": "19d15fe1a20f1313f",
+                    "text": "短短的",
+                },
+                {
+                    "id": "19d15fe1a20f1313f",
+                    "text": "短短的",
+                }]
+            }]
+        },
+        ]
+    };
+</script>
+</html>
