@@ -10,8 +10,8 @@
     <style type="text/css">
 
 		.container {
-		    padding-right: 18px;
-		    padding-left: 18px;
+		    padding-right: 15px;
+		    padding-left: 15px;
 		    margin-right: auto;
 		    margin-left: auto;
 		}
@@ -300,6 +300,9 @@
         return obj;
     }
 
+    var global_start_x = 0;
+    var global_end_x = 0;
+
 	$(document).ready(function(){
         init_global_object();
 
@@ -317,15 +320,15 @@
         // 保存-更新缓存记录
 		$(".topic-save").click(function(){
 			var text = $(".weui-textarea").val();
+            if("" != text) {
+                var obj = new Object();
+                obj.id = get_new_id();
+                obj.text = text;
+                obj.children = [];
 
-            var obj = new Object();
-            obj.id = get_new_id();
-            obj.text = text;
-            obj.children = [];
-
-            var cur_obj = get_cur_obj();
-            cur_obj.push(obj);
-
+                var cur_obj = get_cur_obj();
+                cur_obj.push(obj);
+            }
             ssp.go("topic-list", get_page_deep(), cur_obj);
 
 			showNavbarRightIcon("topic-edit");
@@ -354,6 +357,17 @@
                 set_cur_obj(obj.pointer);
             }
             
+        });
+
+        $(document).on("touchstart", ".topic-item", function(event){
+            var touch = event.touches[0];  
+            global_start_x = touch.pageX; 
+        });
+        $(document).on("touchend", ".topic-item", function(event){
+            var touch = event.touches[0];  
+            global_end_x = touch.pageX; 
+            if(global_start_x - global_end_x > 100)
+                alert(global_start_x - global_end_x);
         });
 	});
 
