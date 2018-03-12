@@ -221,26 +221,25 @@
     </div>
     
 </body>
-<script type="text/html" id="topic-list" callback="initTopicListView" history="true">
+<!-- GROUP TOPIC -->
+<script type="text/html" id="topic-list" group="topic" callback="initTopicListView" history="true">
     <div class="weui-cells topic-list">
-    	<!-- <div class="weui-cell">
-         	我在网上也看到过相关文章说，小霸王公司的学习机可能是山寨或照搬了当年日本任天堂的FC主机带键盘的全套完整配件
-        </div> -->
     </div>
 </script>
-<script type="text/html" id="item-list" callback="initItemListView" history="true">
-    <div class="weui-cells item-list">
-        
-    </div>
-</script>
-<script type="text/html" id="topic-edit" callback="" history="false">
+<script type="text/html" id="topic-edit" group="topic" callback="" history="false">
     <div class="weui-cell">
         <div class="weui-cell__bd">
             <textarea class="weui-textarea" placeholder="请输入文本" rows="20"></textarea>
         </div>
     </div>
 </script>
-
+<!-- GROUP TOPIC -->
+<!-- GROUP CLASSIFY -->
+<script type="text/html" id="classify"  group="classify" callback="initItemListView" history="true">
+    <div class="weui-cells item-list">  
+    </div>
+</script>
+<!-- GROUP CLASSIFY -->
 <script src="http://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
 <script src="./ssp.js"></script>
 <script type="text/javascript">
@@ -300,7 +299,7 @@
 	$(document).ready(function(){
         init_global_object();
 
-		var ssp = new Ssp($(".main-container"));
+		var ssp = new Ssp($(".main-container"), "topic");
 
         // 显示第一页
         ssp.go("topic-list", get_page_deep(), get_cur_obj());

@@ -1,8 +1,9 @@
 //
-    var Ssp = function(container) {
+    var Ssp = function(container , group) {
         this.page_template_list = [];
         this.page_runtime_list = [];
         this.container = container;
+        this.group = group;
         this.init();
     }
 
@@ -13,6 +14,10 @@
                 var page = $(page_template_list[i]);
                 var id   = page.attr("id");
                 var html = page.html();
+
+                if(page.attr("group") != this.group) {
+                    continue;
+                }
 
                 var obj = {
                     "id": id,
@@ -52,6 +57,14 @@
                     return {deep:page_obj_low.deep, pointer:page_obj_low.pointer};
                 }
             }
+        }, 
+
+        recovery: function() {
+            var page_obj_top = this.page_runtime_list.pop();
+            this.container.empty();
+            console.log(page_obj_top);
+            this.container.html(page_obj_top.html);
+            this.page_runtime_list.push(page_obj_top)
         }, 
 
         find: function(page_id) {
