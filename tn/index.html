@@ -360,14 +360,16 @@
         });
 
         $(document).on("touchstart", ".topic-item", function(event){
-            var touch = event.touches[0];  
-            global_start_x = touch.pageX; 
-            alert(global_start_x);
+            alert("111");
         });
         $(document).on("touchend", ".topic-item", function(event){
-            var touch = event.touches[0];  
-            global_end_x = touch.pageX; 
-            alert(global_end_x);
+            alert("222");
+        });
+        $(".topic-item").on("touchstart", function(event){
+            alert("333");
+        });
+        $(".topic-item").on("touchend", function(event){
+            alert("444");
         });
 	});
 
