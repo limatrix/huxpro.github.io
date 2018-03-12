@@ -362,11 +362,17 @@
         $(document).on("touchstart", ".topic-item", function(event){
             var touch = event.touches[0];  
             global_start_x = touch.pageX; 
+            alert("start");
+        });
+        $(document).on("touchmove", ".topic-item", function(event){
+            var touch = event.touches[0];  
+            global_start_x = touch.pageX; 
+            alert("start");
         });
         $(document).on("touchend", ".topic-item", function(event){
             var touch = event.touches[0];  
             global_end_x = touch.pageX; 
-            alert(global_start_x + " " + global_end_x);
+            alert("end");
         });
 	});
 
