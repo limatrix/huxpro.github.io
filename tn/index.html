@@ -366,8 +366,7 @@
         $(document).on("touchend", ".topic-item", function(event){
             var touch = event.touches[0];  
             global_end_x = touch.pageX; 
-            if(global_start_x - global_end_x > 100)
-                alert(global_start_x - global_end_x);
+            alert(global_start_x + " " + global_end_x);
         });
 	});
 
