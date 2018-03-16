@@ -304,11 +304,33 @@ a img {
 </script>
 <!-- GROUP TOPIC -->
 <!-- GROUP CLASSIFY -->
-<script type="text/html" id="classify"  group="classify" callback="initItemListView" history="true">
+<script type="text/html" id="classify-list"  group="classify" callback="" history="false">
     <div class="weui-cells item-list">  
     </div>
 </script>
+<script type="text/html" id="classify-class"  group="classify" callback="" history="false">
+    <div class="classify-class">
+        <h3>文本</h3>
+        <div style="">
+            <button>分类</button><button>分类</button><button>分类</button><button>分类</button>
+            <button>分类</button><button>分类</button><button>分类</button><button>分类</button>
+            <button>分类</button><button>分类</button><button>分类</button><button>分类</button>
+        </div>
+        <h3>记账</h3>
+        <div style="">
+            <button>分类</button><button>分类</button><button>分类</button><button>分类</button>
+            <button>分类</button><button>分类</button><button>分类</button><button>分类</button>
+            <button>分类</button><button>分类</button><button>分类</button><button>分类</button>
+        </div>  
+    </div>
+</script>
 <!-- GROUP CLASSIFY -->
+<!-- GROUP ACCOUNT -->
+<script type="text/html" id="classify-list"  group="account" callback="" history="false">
+    <div class="weui-cells item-list">  
+    </div>
+</script>
+<!-- GROUP ACCOUNT -->
 <div id="item-oper" style="text-align: center; background-color:rgba(255,255,255,0.8); z-index: 100; padding: 10px 15px; display: none;">
     <a class="item-oper_icon">
         <svg t="1521097086521" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2338" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M489.376 534.624a31.904 31.904 0 0 0 45.248 0l304-304a31.968 31.968 0 1 0-45.248-45.248l-304 304a31.968 31.968 0 0 0 0 45.248" p-id="2339"></path><path d="M832 480a32 32 0 0 0-32 32l0.256 288L224 800.256 223.744 224H512a32 32 0 0 0 0-64H223.744A63.84 63.84 0 0 0 160 223.744v576.512C160 835.392 188.608 864 223.744 864h576.512A63.84 63.84 0 0 0 864 800.256V512a32 32 0 0 0-32-32" p-id="2340"></path></svg>
@@ -321,31 +343,31 @@ a img {
     </a>
 </div>
 <div class="weui-tabbar">
-            <a href="#tab1" class="weui-tabbar__item weui-bar__item--on">
-          <div class="weui-tabbar__icon">
-            <img src="./images/icon_nav_button.png" alt="">
-          </div>
-          <p class="weui-tabbar__label">微信</p>
-        </a>
-            <a href="#tab2" class="weui-tabbar__item">
-                <div class="weui-tabbar__icon">
-                    <img src="./images/icon_nav_msg.png" alt="">
-                </div>
-                <p class="weui-tabbar__label">通讯录</p>
-            </a>
-            <a href="#tab3" class="weui-tabbar__item">
-                <div class="weui-tabbar__icon">
-                    <img src="./images/icon_nav_article.png" alt="">
-                </div>
-                <p class="weui-tabbar__label">发现</p>
-            </a>
-            <a href="#tab4" class="weui-tabbar__item">
-                <div class="weui-tabbar__icon">
-                    <img src="./images/icon_nav_cell.png" alt="">
-                </div>
-                <p class="weui-tabbar__label">我</p>
-            </a>
+    <a href="javascript:void(0)" id="topic" class="weui-tabbar__item weui-bar__item--on">
+      <div class="weui-tabbar__icon">
+        <img src="./images/icon_nav_button.png" alt="">
+      </div>
+      <p class="weui-tabbar__label">NOTE</p>
+    </a>
+    <a href="javascript:void(0)" id="classify" class="weui-tabbar__item">
+        <div class="weui-tabbar__icon">
+            <img src="./images/icon_nav_msg.png" alt="">
         </div>
+        <p class="weui-tabbar__label">分类</p>
+    </a>
+    <a href="javascript:void(0)" id="account" class="weui-tabbar__item">
+        <div class="weui-tabbar__icon">
+            <img src="./images/icon_nav_article.png" alt="">
+        </div>
+        <p class="weui-tabbar__label">记账</p>
+    </a>
+    <a href="javascript:void(0)" class="weui-tabbar__item">
+        <div class="weui-tabbar__icon">
+            <img src="./images/icon_nav_cell.png" alt="">
+        </div>
+        <p class="weui-tabbar__label">我</p>
+    </a>
+</div>
 <script src="http://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
 <script src="./ssp.js"></script>
 <script type="text/javascript">
@@ -405,17 +427,33 @@ a img {
     var global_start_x = 0;
     var global_end_x = 0;
 
-	$(document).ready(function(){
-        init_global_object();
+    var global_ssp = null;
+    var global_ssp_object = new Object();
 
-		var ssp = new Ssp($(".main-container"), "topic");
+    function init_global_ssp_object() {
+        global_ssp_object["topic"]    = new Ssp($(".main-container"), "topic");
+        global_ssp_object["classify"] = new Ssp($(".main-container"), "classify");
+        global_ssp = global_ssp_object["topic"];
+    }
+
+    function tab_bar_click_proc(e) {
+        var cur = $(e.currentTarget);
+        var id  = cur.attr("id");
+        global_ssp = global_ssp_object[id];
+    }
+
+	$(document).ready(function(){
+        // 初始化用于存储TOPIC的OBJECT
+        init_global_object();
+        // 初始化所有TAB页面
+        init_global_ssp_object();
 
         // 显示第一页
-        ssp.go("topic-list", get_page_deep(), get_cur_obj());
+        global_ssp.go("topic-list", get_page_deep(), get_cur_obj());
 
         // 显示编辑页面
 		$(".topic-edit").click(function(){
-			ssp.go("topic-edit")
+			global_ssp.go("topic-edit")
 			showNavbarRightIcon("topic-save");
 		});
 
@@ -431,7 +469,7 @@ a img {
                 var cur_obj = get_cur_obj();
                 cur_obj.push(obj);
             }
-            ssp.go("topic-list", get_page_deep(), cur_obj);
+            global_ssp.go("topic-list", get_page_deep(), cur_obj);
 
 			showNavbarRightIcon("topic-edit");
 		});
@@ -444,7 +482,7 @@ a img {
             if(obj) {
                 incr_page_deep();
                 set_cur_obj(obj.children);
-                ssp.go("topic-list", get_page_deep(), get_cur_obj());
+                global_ssp.go("topic-list", get_page_deep(), get_cur_obj());
             } else {
                 console.log("index page, get topic failed")
             }
@@ -452,7 +490,7 @@ a img {
 
         $(".history-back").click(function(){
             console.log("ssp back");
-            var obj = ssp.back();
+            var obj = global_ssp.back();
             console.log(obj);
             if(obj) {
                 set_page_deep(obj.deep);
@@ -487,7 +525,14 @@ a img {
                 $("#item-oper").show();
             }
         });
+
+        $(".weui-tabbar__item").click(function(e){
+            // 初始化TAB CLICK
+            tab_bar_click_proc(e);
+        });
 	});
+
+
 
 	function initTopicListView(children){
 		var str = '';
