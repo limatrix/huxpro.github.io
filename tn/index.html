@@ -305,7 +305,8 @@ a img {
 <!-- GROUP TOPIC -->
 <!-- GROUP CLASSIFY -->
 <script type="text/html" id="classify-list"  group="classify" callback="" history="false">
-    <div class="weui-cells item-list">  
+    <div class="weui-cells item-list">
+        ddddddd
     </div>
 </script>
 <script type="text/html" id="classify-class"  group="classify" callback="" history="false">
@@ -331,14 +332,14 @@ a img {
     </div>
 </script>
 <!-- GROUP ACCOUNT -->
-<div id="item-oper" style="text-align: center; background-color:rgba(255,255,255,0.8); z-index: 100; padding: 10px 15px; display: none;">
-    <a class="item-oper_icon">
+<div id="item-oper" style="text-align: center; background-color:rgba(255,255,255,0.8); z-index: 100; padding: 10px 15px; display: none; position: absolute; ">
+    <a class="item-oper_icon edit">
         <svg t="1521097086521" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2338" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M489.376 534.624a31.904 31.904 0 0 0 45.248 0l304-304a31.968 31.968 0 1 0-45.248-45.248l-304 304a31.968 31.968 0 0 0 0 45.248" p-id="2339"></path><path d="M832 480a32 32 0 0 0-32 32l0.256 288L224 800.256 223.744 224H512a32 32 0 0 0 0-64H223.744A63.84 63.84 0 0 0 160 223.744v576.512C160 835.392 188.608 864 223.744 864h576.512A63.84 63.84 0 0 0 864 800.256V512a32 32 0 0 0-32-32" p-id="2340"></path></svg>
     </a>
-    <a class="item-oper_icon">
+    <a class="item-oper_icon del">
         <svg t="1521097146118" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2564" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M590.208 454.176v210.496a32 32 0 1 0 64 0v-210.496a32 32 0 1 0-64 0M398.208 454.176v210.496a32 32 0 1 0 64 0v-210.496a32 32 0 1 0-64 0" p-id="2565"></path><path d="M377.664 259.584l-8.896-63.36 253.504-35.648 8.928 63.392-253.536 35.616z m443.616-62.336l-126.72 17.792-11.872-84.416a36.512 36.512 0 0 0-14.432-24.224c-16.416-12.384-41.28-11.072-54.752-9.216L359.68 132.864c-46.592 6.56-60.16 30.688-57.28 51.072l11.84 84.544-126.72 17.824a32 32 0 1 0 8.928 63.36l45.92-6.432a31.36 31.36 0 0 0-4.192 14.976v447.936c0 35.328 28.704 64.032 64 64.032h447.968a64.096 64.096 0 0 0 64-64.032V358.208a32 32 0 1 0-64 0v447.968l-448-0.032V358.208a31.744 31.744 0 0 0-8.992-22.112l537.056-75.488a32 32 0 0 0 27.2-36.16 31.648 31.648 0 0 0-36.16-27.2z" p-id="2566"></path></svg>
     </a>
-    <a class="item-oper_icon">
+    <a class="item-oper_icon return">
         <svg t="1521097365910" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2742" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M596.16 284.064H258.56l101.376-101.44a31.968 31.968 0 1 0-45.248-45.216L178.56 273.504c-11.904 11.872-18.496 27.84-18.56 44.8a63.04 63.04 0 0 0 18.56 45.28l136.128 136.16a31.904 31.904 0 0 0 45.248 0 31.968 31.968 0 0 0 0-45.248l-106.752-106.496H596.16c114.88 0 208.32 93.312 208.32 208s-93.44 208-208.32 208h-223.36a32 32 0 0 0 0 64h223.36c150.144 0 272.32-122.016 272.32-272 0-149.984-122.176-272-272.32-272" p-id="2743"></path></svg>
     </a>
 </div>
@@ -371,167 +372,23 @@ a img {
 <script src="http://cdn.bootcss.com/jquery/1.11.0/jquery.min.js"></script>
 <script src="./ssp.js"></script>
 <script type="text/javascript">
-	var globalObjectCurPointer = null;
-	var globalObjectCurDeep    = 0;
-	var globalObjectCurSeq     = 0;
 
-    // 单击 - 进入下一级, 如果没有下一级, 进入下一级的编辑
-    // 滑动 - 显示出编辑和删除按钮
-    // 双击 - ......
-
-    var global_object = null;
-    function init_global_object() {
-        global_object = new Object();
-        global_object.id = 0;
-        global_object.text = "";
-        global_object.children = [];
-        // 从服务器拿来数据后需要再初始化children
-        set_cur_obj(global_object.children);
-    }
-
-    function set_cur_obj(obj) {
-        globalObjectCurPointer = obj;
-    }
-    function get_cur_obj() {
-        console.log(globalObjectCurPointer);
-        return globalObjectCurPointer;
-    }
-
-    function incr_page_deep() {
-        globalObjectCurDeep++;
-    }
-    function set_page_deep(deep) {
-        globalObjectCurDeep = deep;
-    }
-    function get_page_deep() {
-        return globalObjectCurDeep;
-    }
-
-    function get_new_id() {
-        var d = new Date();
-        return "" + d.getTime();
-    }
-
-    function get_obj_by_id(id) {
-        var lst = get_cur_obj();
-        var obj = null;
-        for (var i = 0; i < lst.length; i++) {
-            obj = lst[i];
-            if(obj.id == id) {
-                break;
-            }
-        }
-        return obj;
-    }
-
-    var global_start_x = 0;
-    var global_end_x = 0;
-
-    var global_ssp = null;
-    var global_ssp_object = new Object();
-
-    function init_global_ssp_object() {
-        global_ssp_object["topic"]    = new Ssp($(".main-container"), "topic");
-        global_ssp_object["classify"] = new Ssp($(".main-container"), "classify");
-        global_ssp = global_ssp_object["topic"];
-    }
+    var global_topic_object = null;
 
     function tab_bar_click_proc(e) {
         var cur = $(e.currentTarget);
-        var id  = cur.attr("id");
-        global_ssp = global_ssp_object[id];
+        var id  = cur.attr("id");     
     }
 
 	$(document).ready(function(){
-        // 初始化用于存储TOPIC的OBJECT
-        init_global_object();
-        // 初始化所有TAB页面
-        init_global_ssp_object();
 
-        // 显示第一页
-        global_ssp.go("topic-list", get_page_deep(), get_cur_obj());
-
-        // 显示编辑页面
-		$(".topic-edit").click(function(){
-			global_ssp.go("topic-edit")
-			showNavbarRightIcon("topic-save");
-		});
-
-        // 保存-更新缓存记录
-		$(".topic-save").click(function(){
-			var text = $(".weui-textarea").val();
-            if("" != text) {
-                var obj = new Object();
-                obj.id = get_new_id();
-                obj.text = text;
-                obj.children = [];
-
-                var cur_obj = get_cur_obj();
-                cur_obj.push(obj);
-            }
-            global_ssp.go("topic-list", get_page_deep(), cur_obj);
-
-			showNavbarRightIcon("topic-edit");
-		});
-
-        // 进入下一级
-		$(document).on("click", ".topic-item", function(){
-			console.log(this)
-			var id = $(this).attr("id");
-			var obj = get_obj_by_id(id);
-            if(obj) {
-                incr_page_deep();
-                set_cur_obj(obj.children);
-                global_ssp.go("topic-list", get_page_deep(), get_cur_obj());
-            } else {
-                console.log("index page, get topic failed")
-            }
-		});
-
-        $(".history-back").click(function(){
-            console.log("ssp back");
-            var obj = global_ssp.back();
-            console.log(obj);
-            if(obj) {
-                set_page_deep(obj.deep);
-                set_cur_obj(obj.pointer);
-            }
-            
-        });
-
-        $(document).on("touchstart", ".topic-item", function(event){
-            var o_event = event.originalEvent;
-            var touch = o_event.changedTouches[0];
-            global_start_x = touch.pageX;
-            console.log(event);
-        });
-        $(document).on("touchend", ".topic-item", function(event){
-            console.log(event);
-            var o_event = event.originalEvent;
-            var touch = o_event.changedTouches[0];
-            global_end_x = touch.pageX;
-            var distance = Math.abs(global_end_x - global_start_x);
-            if(distance > 100) {
-                var cur = $(event.currentTarget);
-                var id  = cur.attr("id");
-                var offset = cur.offset();
-                var height = cur.Height();
-                console.log(id);
-                console.log(offset);
-                console.log(height);
-                $("#item-oper").offset({top:offset.top,left:offset.left});
-                $("#item-oper").height(height);
-                $("#item-oper").css("line-height", height + "px");
-                $("#item-oper").show();
-            }
-        });
-
+        global_topic_object = new Topic();
+        
         $(".weui-tabbar__item").click(function(e){
             // 初始化TAB CLICK
             tab_bar_click_proc(e);
         });
 	});
-
 
 
 	function initTopicListView(children){
