@@ -304,8 +304,8 @@ a img {
 </script>
 <!-- GROUP TOPIC -->
 <!-- GROUP CLASSIFY -->
-<script type="text/html" id="classify-list"  group="classify" callback="" history="false">
-    <div class="weui-cells item-list">
+<script type="text/html" id="classify-list"  group="classify" callback="initClassListView" history="true">
+    <div class="weui-cells classify-list">
         ddddddd
     </div>
 </script>
@@ -373,16 +373,20 @@ a img {
 <script src="./ssp.js"></script>
 <script type="text/javascript">
 
-    var global_topic_object = null;
+    var global_tab_object = null;
 
     function tab_bar_click_proc(e) {
         var cur = $(e.currentTarget);
-        var id  = cur.attr("id");     
+        var id  = cur.attr("id"); 
+        var tab_object = global_tab_object[id];
+        tab_object.recovery();
     }
 
 	$(document).ready(function(){
 
-        global_topic_object = new Topic();
+        global_tab_object = new Object();
+        global_tab_object["topic"] = new Topic();
+        global_tab_object["classify"] = new Classify();
         
         $(".weui-tabbar__item").click(function(e){
             // 初始化TAB CLICK
@@ -403,30 +407,12 @@ a img {
 		$(".topic-list").append(str);
 	}
 
-    function initItemListView(children) {
-        var str = '';
-        console.log(children)
-        for (var i = children.length - 1; i >= 0; i--) {
-            var id = children[i].id;
-            var text = children[i].text;
-            str += '<div class="weui-cell item-item" id="' + id + '">' + text + '</div>';
-        }
-        $(".item-list").empty();
-        $(".item-list").append(str);
+    function initClassListView() {
+
+        var str = '<div class="weui-cell classify-item" id="1521508161909">有多项发明，获得三项发明专利，三项实用新型专利。由于李红涛的重大立功表现，符合法律改判和减刑规定，死缓改有期徒刑。2009年，李红涛刑满释放，开始新的生活。</div><div class="weui-cell classify-item" id="1521508157189">其实中国的无刷电机就是在这么一个传奇的故事里诞生的，作为无刷电机之父，李红涛成功让中国的电机从有刷开始向无刷过渡。那么究竟无刷电机有什么优势，能让一名死刑犯改判，甚至重获新生</div>';
+        $(".weui-cells.classify-list").html(str);
     }
 
-	function showNavbarRightIcon(icon){
-		if(icon == "topic-edit")
-		{
-			$(".topic-save").hide();
-			$(".topic-edit").show();
-		}
-		if(icon == "topic-save")
-		{
-			$(".topic-edit").hide();
-			$(".topic-save").show();
-		}
-	}
 	// - 每个主题使用一个object, 把所有object放在array里
 	// - 只显示第一层主题时,所有相关全局变量都是默认值
 	// - 继续进入某一主题时,才给全局变量赋值

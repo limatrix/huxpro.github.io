@@ -172,6 +172,10 @@ Topic.prototype = {
         this.ssp.go("topic-list", this._get_page_deep(), this._get_cur_obj());
     },
 
+    recovery: function() {
+        this.ssp.recovery();
+    },
+
     _bind_edit_click: function() {
         var _this = this;
         $(".topic-edit").click(function(){
@@ -365,3 +369,36 @@ Topic.prototype = {
         }
     },
 }
+
+var Classify = function() {
+    this.ssp = null;
+    this.init();
+};
+
+Classify.prototype = {
+    init: function() {
+        this._init_ssp();
+        this._bind_item_click();
+    },
+
+    _init_ssp: function() {
+        this.ssp = new Ssp($(".main-container"), "classify");
+    },
+
+    recovery: function() {
+        if(0 == this.ssp.length()) {
+            this.ssp.go("classify-list", 0);
+        } else {
+            this.ssp.recovery();
+        }
+    },
+
+    _bind_item_click: function() {
+        var _this = this;
+        $(document).on("click", ".weui-cell.classify-item", function(e){
+            var id = $(e.currentTarget).attr("id");
+            console.log(id);
+            _this.ssp.go("classify-class", 1);
+        });
+    },
+};
