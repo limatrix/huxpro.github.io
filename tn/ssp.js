@@ -51,7 +51,6 @@
                 var page_obj_low = this.page_runtime_list.pop();
                 if(page_obj_low) {
                     this.container.empty();
-                    console.log(page_obj_low);
                     this.container.html(page_obj_low.html);
                     this.page_runtime_list.push(page_obj_low)
                     return {deep:page_obj_low.deep, pointer:page_obj_low.pointer};
@@ -62,7 +61,6 @@
         recovery: function() {
             var page_obj_top = this.page_runtime_list.pop();
             this.container.empty();
-            console.log(page_obj_top);
             this.container.html(page_obj_top.html);
             this.page_runtime_list.push(page_obj_top)
         }, 
@@ -93,7 +91,6 @@
                 } else {
                     params_str = "()";
                 }
-                console.log(page_obj.callback + params_str)
                 eval(page_obj.callback + params_str);
             }
 
@@ -122,8 +119,6 @@
                     new_obj.html = this.container.html();
                     this.page_runtime_list.push(new_obj);
                 }
-                console.log("run time obj list:\n")
-                console.log(this.page_runtime_list);
             }
         },
     };
@@ -182,7 +177,6 @@ Topic.prototype = {
             _this.ssp.go("topic-edit")
             _this._show_nav_bar_icon("topic-save");
             _this.save_tag = 1;
-            console.log("_bind_edit_click");
         });
     },
 
@@ -202,9 +196,7 @@ Topic.prototype = {
                 }
             } else if(_this.save_tag == 2) { //修改
                 var obj = _this._get_obj_by_id(_this.cur_opt_item_id);
-                console.log(obj);
                 obj.text = text;
-                console.log(obj);
             } else {
                 console.log("this.save_tag error : " + _this.save_tag);
             }
@@ -218,7 +210,6 @@ Topic.prototype = {
     _bind_item_click: function() {
         var _this = this;
         $(document).on("click", ".topic-item", function(){
-            console.log(this)
             var id = $(this).attr("id");
             var obj = _this._get_obj_by_id(id);
             if(obj) {
@@ -234,9 +225,7 @@ Topic.prototype = {
     _bind_back_click: function() {
         var _this = this;
         $(".history-back").click(function(){
-            console.log("ssp back");
             var obj = _this.ssp.back();
-            console.log(obj);
             if(obj) {
                 _this._set_page_deep(obj.deep);
                 _this._set_cur_obj(obj.pointer);
@@ -252,11 +241,9 @@ Topic.prototype = {
             var touch = o_event.changedTouches[0];
             _this.start_x = touch.pageX;
             _this.cur_opt_item_id = $(event.currentTarget).attr("id");
-            console.log("++++ " + _this.cur_opt_item_id);
         });
 
         $(document).on("touchend", ".topic-item", function(event){
-            console.log(event);
             var o_event = event.originalEvent;
             var touch = o_event.changedTouches[0];
             _this.end_x = touch.pageX;
@@ -268,9 +255,7 @@ Topic.prototype = {
                 var offset = cur.offset();
                 var height = cur.height();
                 var width  = cur.width();
-                console.log(offset);
                 $("#item-oper").offset({top:offset.top,left:offset.left});
-                console.log({top:offset.top,left:offset.left});
                 $("#item-oper").height(height);
                 $("#item-oper").width(width);
                 $("#item-oper").css("line-height", height + "px");
@@ -283,9 +268,7 @@ Topic.prototype = {
         var _this = this;
         $(".item-oper_icon.edit").click(function(e){
             $("#item-oper").hide();
-            console.log(_this);
             var obj = _this._get_obj_by_id(_this.cur_opt_item_id);
-            console.log(obj);
             _this.ssp.go("topic-edit");
             $(".weui-textarea").val(obj.text);
             _this._show_nav_bar_icon("topic-save");
@@ -293,7 +276,6 @@ Topic.prototype = {
         });
         $(".item-oper_icon.del").click(function(e){
             $("#item-oper").hide();
-            console.log("******" + _this.cur_opt_item_id);
             _this._remove_obj_by_id(_this.cur_opt_item_id);
             _this.ssp.go("topic-list", _this._get_page_deep(), _this._get_cur_obj());
         });
@@ -354,9 +336,6 @@ Topic.prototype = {
 
     _remove_obj_by_id: function(id) {
         var lst = this._get_cur_obj();
-        console.log("\n--------------\n");
-        console.log(id);
-        console.log(lst);
         var obj = null;
         for (var i = 0; i < lst.length; i++) {
             obj = lst[i];
@@ -397,7 +376,6 @@ Classify.prototype = {
         var _this = this;
         $(document).on("click", ".weui-cell.classify-item", function(e){
             var id = $(e.currentTarget).attr("id");
-            console.log(id);
             _this.ssp.go("classify-class", 1);
         });
     },
