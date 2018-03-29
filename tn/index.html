@@ -261,13 +261,13 @@ a img {
     	<div class="container clearfix">
     		<ul class="nav navbar-nav">
     			<li>
-    				<a class="history-back">
+    				<a class="nav back">
     					<svg t="1517816725296" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3291" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M896 544H250.4l242.4 242.4L448 832 173.6 557.6 128 512l45.6-45.6L448 192l45.6 45.6L250.4 480H896v64z" p-id="3292" fill="#1a1a1a"></path></svg>
     				</a>
     			</li>
     	
     			<li>
-    				<a>
+    				<a class="nav home">
     					<svg t="1517816960537" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3469" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M512.8 206.4L768 389.6V832H640V576H384v256H256V389.6l256.8-183.2m0-71.2c-6.4 0-12.8 1.6-18.4 5.6L104 419.2c-12.8 8.8-6.4 28.8 9.6 28.8H192v432c0 8.8 7.2 16 16 16h224c8.8 0 16-7.2 16-16V640h128v240c0 8.8 7.2 16 16 16h224c8.8 0 16-7.2 16-16V448h78.4c15.2 0 21.6-20 9.6-28.8L531.2 141.6c-5.6-4-12-6.4-18.4-6.4z" p-id="3470" fill="#1a1a1a"></path></svg>
     				</a>
     			</li>
@@ -275,10 +275,10 @@ a img {
     		</ul>
     		<ul class="nav navbar-nav navbar-right">
     			<li>
-    				<a class="topic-edit">
+    				<a class="nav add">
     					<svg t="1517817041446" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3647" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M896 480H544.8V128h-65.6v352H128v66.4h351.2V896h65.6V546.4H896z" p-id="3648" fill="#1a1a1a"></path></svg>
     				</a>
-    				<a class="topic-save" style="display: none;">
+    				<a class="nav save" style="display: none;">
     					<svg t="1521097452972" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5768" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M384 725.333333v42.666667h213.333333v-42.666667H384z m-21.333333-85.333333H682.666667v128h42.666666V419.370667L604.629333 298.666667H256v469.333333h42.666667v-128h64z m280.362666-426.666667L810.666667 380.970667V853.333333H170.666667V213.333333h472.362666zM298.666667 341.333333h85.333333v213.333334H298.666667V341.333333z" fill="#444444" p-id="5769"></path></svg>
     				</a>
     			</li>
@@ -373,45 +373,29 @@ a img {
 <script src="./ssp.js"></script>
 <script type="text/javascript">
 
-    var global_tab_object = null;
-
-    function tab_bar_click_proc(e) {
-        var cur = $(e.currentTarget);
-        var id  = cur.attr("id"); 
-        var tab_object = global_tab_object[id];
-        tab_object.recovery();
+    function show_icons(lst) {
+        $(".nav.navbar-nav").find(".nav").hide();
+        for(c in lst) {
+            $(".nav." + lst[c]).show();
+        }
     }
 
 	$(document).ready(function(){
 
-        global_tab_object = new Object();
-        global_tab_object["topic"] = new Topic();
-        global_tab_object["classify"] = new Classify();
         
-        $(".weui-tabbar__item").click(function(e){
-            // 初始化TAB CLICK
-            tab_bar_click_proc(e);
-        });
+
+        var topic = new Topic();
+        topic.init_ssp(topic);
+
+        var classify = new Classify();
+        classify.init_ssp(classify);
+
+        var iconevent = new IconEvent();
+        iconevent.addCallback("topic", topic);
+        iconevent.addCallback("classify", classify);
+        
+
 	});
-
-
-	function initTopicListView(children){
-		var str = '';
-        console.log(children);
-		for (var i = children.length - 1; i >= 0; i--) {
-			var id = children[i].id;
-			var text = children[i].text;
-			str += '<div class="weui-cell topic-item" id="' + id + '">' + text + '</div>';
-		}
-		$(".topic-list").empty();
-		$(".topic-list").append(str);
-	}
-
-    function initClassListView() {
-
-        var str = '<div class="weui-cell classify-item" id="1521508161909">有多项发明，获得三项发明专利，三项实用新型专利。由于李红涛的重大立功表现，符合法律改判和减刑规定，死缓改有期徒刑。2009年，李红涛刑满释放，开始新的生活。</div><div class="weui-cell classify-item" id="1521508157189">其实中国的无刷电机就是在这么一个传奇的故事里诞生的，作为无刷电机之父，李红涛成功让中国的电机从有刷开始向无刷过渡。那么究竟无刷电机有什么优势，能让一名死刑犯改判，甚至重获新生</div>';
-        $(".weui-cells.classify-list").html(str);
-    }
 
 	// - 每个主题使用一个object, 把所有object放在array里
 	// - 只显示第一层主题时,所有相关全局变量都是默认值

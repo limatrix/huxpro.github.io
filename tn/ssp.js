@@ -1,9 +1,77 @@
 //
-    var Ssp = function(container , group) {
+    var IconEvent = function() {
+        this.page_object = new Object();
+        this.page_current = "topic";
+        this.init();
+    };
+
+    IconEvent.prototype = {
+        init: function() {
+            this._bind_back_click();
+            this._bind_home_click();
+            this._bind_add_click();
+            this._bind_save_click();
+            this._bind_tab_click();
+        },
+
+        setCurPage: function(page) {
+            this.page_current = page;
+        },
+
+        addCallback: function(page, obj) {
+            this.page_object[page] = obj;
+        },
+
+        _bind_back_click: function() {
+            var _this = this;
+            $(".nav.back").click(function(){
+                if(_this.page_object[_this.page_current].back)
+                    _this.page_object[_this.page_current].back();
+            });
+        },
+
+        _bind_home_click: function() {
+            var _this = this;
+            $(".nav.home").click(function(){
+                if(_this.page_object[_this.page_current].home)
+                    _this.page_object[_this.page_current].home();
+            });
+        },
+
+        _bind_add_click: function() {
+            var _this = this;
+            $(".nav.add").click(function(){
+                if(_this.page_object[_this.page_current].add)
+                    _this.page_object[_this.page_current].add();
+            });
+        },
+
+        _bind_save_click: function() {
+            var _this = this;
+            $(".nav.save").click(function(){
+                if(_this.page_object[_this.page_current].save)
+                    _this.page_object[_this.page_current].save();
+            });
+        },
+
+        _bind_tab_click: function() {
+            var _this = this;
+            $(".weui-tabbar__item").click(function(e){
+                var cur = $(e.currentTarget);
+                _this.page_current = cur.attr("id"); 
+                if(_this.page_object[_this.page_current].recovery)
+                    _this.page_object[_this.page_current].recovery();
+            });
+        },
+        
+    };
+    
+    var Ssp = function(container , group, intf) {
         this.page_template_list = [];
         this.page_runtime_list = [];
         this.container = container;
         this.group = group;
+        this.intf  = intf;
         this.init();
     }
 
@@ -23,9 +91,7 @@
                     "id": id,
                     "html": html
                 };
-
-                // 记录回调函数的名字
-                obj.callback = page.attr("callback") || null; 
+ 
                 // 记录页面是否需要生成历史记录
                 obj.history  = (page.attr("history") == "true") ? true : false;
 
@@ -33,12 +99,12 @@
             }
         },
 
-        go: function(page_id, deep, params) {
+        go: function(page_id, deep) {
             var page_obj = this.find(page_id);
             if(!page_obj){
                 console.log("funtion go: can not find page " + page_id);
             } else {
-                this.load_new_page(page_obj, deep, params);
+                this.load_new_page(page_obj, deep);
             }
         },
 
@@ -53,7 +119,7 @@
                     this.container.empty();
                     this.container.html(page_obj_low.html);
                     this.page_runtime_list.push(page_obj_low)
-                    return {deep:page_obj_low.deep, pointer:page_obj_low.pointer};
+                    return page_obj_low.deep;
                 }
             }
         }, 
@@ -79,21 +145,13 @@
             return null;
         },
 
-        load_new_page: function(page_obj, deep, params) {
+        load_new_page: function(page_obj, deep) {
             this.container.empty();
             this.container.html(page_obj.html);
-            
-            if(page_obj.callback) {
-                var params_str = "";
-                
-                if(undefined != params) {
-                   params_str = "(" + JSON.stringify(params) + ")";
-                } else {
-                    params_str = "()";
-                }
-                eval(page_obj.callback + params_str);
-            }
 
+            if(this.intf.load)
+                this.intf.load();
+            
             // 将页面所有内容保存, 供回退使用
             if(page_obj.history)
             {
@@ -108,18 +166,18 @@
                         this.page_runtime_list.push(temp_obj);
                         var new_obj = Object();
                         new_obj.deep = deep;
-                        new_obj.pointer = params;
                         new_obj.html = this.container.html();
                         this.page_runtime_list.push(new_obj);
                     }
                 } else {
                     var new_obj = Object();
                     new_obj.deep = deep;
-                    new_obj.pointer = params;
                     new_obj.html = this.container.html();
                     this.page_runtime_list.push(new_obj);
                 }
             }
+
+            console.log(this.page_runtime_list);
         },
     };
 
@@ -134,18 +192,14 @@ var Topic = function() {
     this.end_x           = 0;
     this.save_tag        = 0;
     this.cur_opt_item_id = "";
-    this.init();
+    this.deep_ptr_object = new Object();
 }
 
 Topic.prototype = {
-    init: function() {
+    _init: function() {
         this._init_global_object();
-        this._init_ssp();
         this._init_index();
-        this._bind_edit_click();
-        this._bind_save_click();
         this._bind_item_click();
-        this._bind_back_click();
         this._bind_touch();
         this._bind_oper_icon();
     }, 
@@ -159,52 +213,41 @@ Topic.prototype = {
         this._set_cur_obj(this.global_object.children);
     },
 
-    _init_ssp: function() {
-        this.ssp = new Ssp($(".main-container"), "topic");
+    init_ssp: function(intf) {
+        this.ssp = new Ssp($(".main-container"), "topic", intf);
+        this._init();
+    },
+
+    _topic_list_icon: function() {
+        if(0 == this._get_page_deep()) {
+            show_icons(["add"]);
+        } else {
+            show_icons(["back", "home", "add"]);
+        }
     },
 
     _init_index: function() {
-        this.ssp.go("topic-list", this._get_page_deep(), this._get_cur_obj());
+        this._go_topic_list();
     },
 
-    recovery: function() {
-        this.ssp.recovery();
+    load: function() {
+        var str = '';
+        var children = this._get_cur_obj();
+        for (var i = children.length - 1; i >= 0; i--) {
+            var id = children[i].id;
+            var text = children[i].text;
+            str += '<div class="weui-cell topic-item" id="' + id + '">' + text + '</div>';
+        }
+        $(".topic-list").empty();
+        $(".topic-list").append(str);
     },
 
-    _bind_edit_click: function() {
-        var _this = this;
-        $(".topic-edit").click(function(){
-            _this.ssp.go("topic-edit")
-            _this._show_nav_bar_icon("topic-save");
-            _this.save_tag = 1;
-        });
-    },
-
-    _bind_save_click: function() {
-        var _this = this;
-        $(".topic-save").click(function(){
-            var text = $(".weui-textarea").val();
-            var cur_obj = _this._get_cur_obj();
-            if(_this.save_tag == 1) { //新增
-                if("" != text) {
-                    var obj = new Object();
-                    obj.id = _this._get_new_id();
-                    obj.text = text;
-                    obj.children = [];
-
-                    cur_obj.push(obj);
-                }
-            } else if(_this.save_tag == 2) { //修改
-                var obj = _this._get_obj_by_id(_this.cur_opt_item_id);
-                obj.text = text;
-            } else {
-                console.log("this.save_tag error : " + _this.save_tag);
-            }
-            _this.save_tag = 0;
-            _this.ssp.go("topic-list", _this._get_page_deep(), cur_obj);
-
-            _this._show_nav_bar_icon("topic-edit");
-        });
+    _go_topic_list: function() {
+        var deep = this._get_page_deep();
+        var ptr  = this._get_cur_obj();
+        this.deep_ptr_object[""+deep] = ptr;
+        this.ssp.go("topic-list", deep);
+        this._topic_list_icon();
     },
 
     _bind_item_click: function() {
@@ -215,22 +258,10 @@ Topic.prototype = {
             if(obj) {
                 _this._incr_page_deep();
                 _this._set_cur_obj(obj.children);
-                _this.ssp.go("topic-list", _this._get_page_deep(), _this._get_cur_obj());
+                _this._go_topic_list();  
             } else {
                 console.log("index page, get topic failed")
             }
-        });
-    },
-
-    _bind_back_click: function() {
-        var _this = this;
-        $(".history-back").click(function(){
-            var obj = _this.ssp.back();
-            if(obj) {
-                _this._set_page_deep(obj.deep);
-                _this._set_cur_obj(obj.pointer);
-            }
-            
         });
     },
 
@@ -284,19 +315,6 @@ Topic.prototype = {
         });
     },
 
-    _show_nav_bar_icon: function(icon) {
-        if(icon == "topic-edit")
-        {
-            $(".topic-save").hide();
-            $(".topic-edit").show();
-        }
-        if(icon == "topic-save")
-        {
-            $(".topic-edit").hide();
-            $(".topic-save").show();
-        }
-    },
-
     _set_cur_obj: function (obj) {
         this.cur_object_ptr = obj;
     },
@@ -347,21 +365,60 @@ Topic.prototype = {
             lst.splice(i, 1);
         }
     },
+
+    recovery: function() {
+        this.ssp.recovery();
+    },
+
+    add: function() {
+        this.ssp.go("topic-edit")
+        this.save_tag = 1;
+        show_icons(["back", "save"]);
+    },
+
+    save: function() {
+        var text = $(".weui-textarea").val();
+        var cur_obj = this._get_cur_obj();
+        console.log(this.save_tag);
+        if(this.save_tag == 1) { //新增
+            if("" != text) {
+                var obj = new Object();
+                obj.id = this._get_new_id();
+                obj.text = text;
+                obj.children = [];
+
+                cur_obj.push(obj);
+            }
+        } else if(this.save_tag == 2) { //修改
+            var obj = this._get_obj_by_id(this.cur_opt_item_id);
+            obj.text = text;
+        } else {
+            console.log("this.save_tag error : " + this.save_tag);
+        }
+        this.save_tag = 0;
+        this._go_topic_list();  
+    },
+    back: function(deep) {
+        var deep = this.ssp.back();
+        var ptr  = this.deep_ptr_object[""+deep];
+        this._set_page_deep(deep);
+        this._set_cur_obj(ptr);
+        this._topic_list_icon();
+    },
 }
 
 var Classify = function() {
     this.ssp = null;
-    this.init();
 };
 
 Classify.prototype = {
     init: function() {
-        this._init_ssp();
         this._bind_item_click();
     },
-
-    _init_ssp: function() {
-        this.ssp = new Ssp($(".main-container"), "classify");
+    
+    init_ssp: function(intf) {
+        this.ssp = new Ssp($(".main-container"), "classify", intf);
+        this.init();
     },
 
     recovery: function() {
@@ -379,4 +436,8 @@ Classify.prototype = {
             _this.ssp.go("classify-class", 1);
         });
     },
+
+    add: function() {
+        console.log("classify");
+    }
 };
