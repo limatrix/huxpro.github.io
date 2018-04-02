@@ -72,6 +72,7 @@
         this.container = container;
         this.group = group;
         this.intf  = intf;
+        this.ifhistory = false;
         this.init();
     }
 
@@ -109,6 +110,7 @@
         },
 
         back: function() {
+            /*
             var len = this.page_runtime_list.length;
             if( len <= 1) {
                 //不动
@@ -121,6 +123,19 @@
                     this.page_runtime_list.push(page_obj_low)
                     return page_obj_low.deep;
                 }
+            }*/
+            console.log(this.ifhistory);
+            if(this.ifhistory) {
+                this.page_runtime_list.pop();
+            } else {
+            }
+
+            var page_obj_low = this.page_runtime_list.pop();
+            if(page_obj_low) {
+                this.container.empty();
+                this.container.html(page_obj_low.html);
+                this.page_runtime_list.push(page_obj_low)
+                return page_obj_low.deep;
             }
         }, 
 
@@ -152,6 +167,7 @@
             if(this.intf.load)
                 this.intf.load();
             
+            this.ifhistory = page_obj.history;
             // 将页面所有内容保存, 供回退使用
             if(page_obj.history)
             {
@@ -434,7 +450,13 @@ Classify.prototype = {
         $(document).on("click", ".weui-cell.classify-item", function(e){
             var id = $(e.currentTarget).attr("id");
             _this.ssp.go("classify-class", 1);
+            show_icons(["back"]);
         });
+    },
+
+    back: function() {
+        this.ssp.back();
+        show_icons([]);
     },
 
     add: function() {
