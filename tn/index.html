@@ -375,11 +375,13 @@ a img {
 </script>
 <!-- GROUP TOPIC -->
 <!-- GROUP CLASSIFY -->
-<script type="text/html" id="classify-list"  group="classify" callback="initClassListView" history="true">
+<script type="text/html" id="classify-list"  group="classify" history="true">
     <div class="weui-cells classify-list">
-        <div class="weui-cell classify-item" id="1522291919541">点点滴滴</div>
+        <div class="weui-cell classify-item" id="1522291919541">点点滴滴123.6</div>
+        <div class="weui-cell classify-item" id="1522291919541">点点滴滴xxxx</div>
     </div>
 </script>
+
 <script type="text/html" id="classify-class"  group="classify" callback="" history="false">
     <div class="classify-class" style="padding: 0px 15px 0 15px;">
         <span>文本</span>
@@ -419,6 +421,11 @@ a img {
     <a class="item-oper_icon return">
         <svg t="1521097365910" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2742" xmlns:xlink="http://www.w3.org/1999/xlink" width="26" height="26"><defs><style type="text/css"></style></defs><path d="M596.16 284.064H258.56l101.376-101.44a31.968 31.968 0 1 0-45.248-45.216L178.56 273.504c-11.904 11.872-18.496 27.84-18.56 44.8a63.04 63.04 0 0 0 18.56 45.28l136.128 136.16a31.904 31.904 0 0 0 45.248 0 31.968 31.968 0 0 0 0-45.248l-106.752-106.496H596.16c114.88 0 208.32 93.312 208.32 208s-93.44 208-208.32 208h-223.36a32 32 0 0 0 0 64h223.36c150.144 0 272.32-122.016 272.32-272 0-149.984-122.176-272-272.32-272" p-id="2743"></path></svg>
     </a>
+</div>
+<div id="classify-record" style="text-align: center; background-color:rgba(255,255,255,0.8); z-index: 100; padding: 10px 15px; position: absolute; display: none;">
+    <input type="text" name="classify" id="classify"/> <br />
+    <input type="text" name="count" id="count"/> <br />
+    <button class="btn btn-default record-ensure">确认</button><button class="btn btn-default record-error">解析错误,转为普通文本</button>
 </div>
 <ul class="pagination" id="pagination1"></ul>
 <div class="weui-tabbar">
@@ -473,19 +480,19 @@ a img {
         iconevent.addCallback("topic", topic);
         iconevent.addCallback("classify", classify);
         
-        $.jqPaginator('#pagination1', {
-            totalPages: 100,
-            visiblePages: 5,
-            currentPage: 3,
-            onPageChange: function (num, type) {
-                $('#p1').text(type + '：' + num);
-            },
-            first: '<li class="first"><a href="javascript:;"><<</a></li>',
-            prev: '<li class="prev"><a href="javascript:;"><</a></li>',
-            next: '<li class="next"><a href="javascript:;">></a></li>',
-            last: '<li class="last"><a href="javascript:;">>></a></li>',
-            page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
-        });
+        // $.jqPaginator('#pagination1', {
+        //     totalPages: 100,
+        //     visiblePages: 5,
+        //     currentPage: 3,
+        //     onPageChange: function (num, type) {
+        //         $('#p1').text(type + '：' + num);
+        //     },
+        //     first: '<li class="first"><a href="javascript:;"><<</a></li>',
+        //     prev: '<li class="prev"><a href="javascript:;"><</a></li>',
+        //     next: '<li class="next"><a href="javascript:;">></a></li>',
+        //     last: '<li class="last"><a href="javascript:;">>></a></li>',
+        //     page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
+        // });
 	});
 
 	// - 每个主题使用一个object, 把所有object放在array里

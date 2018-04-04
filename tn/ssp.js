@@ -430,6 +430,8 @@ var Classify = function() {
 Classify.prototype = {
     init: function() {
         this._bind_item_click();
+        this._bind_record_ensure();
+        this._bind_record_error();
     },
     
     init_ssp: function(intf) {
@@ -448,9 +450,68 @@ Classify.prototype = {
     _bind_item_click: function() {
         var _this = this;
         $(document).on("click", ".weui-cell.classify-item", function(e){
-            var id = $(e.currentTarget).attr("id");
+            var obj = $(e.currentTarget);
+            var id = obj.attr("id");
+            var text = $.trim(obj.text());
+            // 判断前面是文字，后面是数字
+            if(text.length < 24) {
+                var i;
+                var isnum = true;
+                for(i = 0; i < text.length; i++) {
+                    if(text[i] >= '0' && text[i] <= '9') {
+                        break;
+                    }
+                }
+                console.log(text[i]);
+                if(i == text.length) {
+                    _this.ssp.go("classify-class", 1);
+                } else {
+                    var j = i;
+                    for(; i < text.length; i++) {
+                        if((text[i] >= '0' && text[i] <= '9') || text[i] == '.') {
+
+                        } else {
+                            isnum = false;
+                            break;
+                        }
+                    }
+                    if(isnum) {
+                        var cls = $.trim(text.substring(0, j));
+                        var cnt = $.trim(text.substring(j, text.length));
+                        var cntf = parseFloat(cnt);
+                        console.log(cls);
+                        console.log(cnt);
+                        $("#classify-record").find("#classify").val(cls);
+                        $("#classify-record").find("#count").val(cnt);
+                        $("#classify-record").show();
+                    } else {
+                        //文本
+                        _this.ssp.go("classify-class", 1);
+                    }
+                }
+                
+            } else {
+                //文本
+                _this.ssp.go("classify-class", 1);
+            }
+
+            //_this.ssp.go("classify-class", 1);
+            //show_icons(["back"]);
+        });
+    },
+
+    _bind_record_ensure: function() {
+        var _this = this;
+        $(".record-ensure").click(function(){
+            $("#classify-record").hide();
+        });
+    },
+
+    _bind_record_error: function() {
+        var _this = this;
+        $(".record-error").click(function(){
             _this.ssp.go("classify-class", 1);
-            show_icons(["back"]);
+            $("#classify-record").hide();
         });
     },
 
