@@ -88,7 +88,34 @@ SCTP:SCTP是一个面向连接的流传输协议，它可以在两个端点之�
 TIPC:爱立信公司提出的一种透明进程间通信协议, 主要适用于高可用(HAL)和动态集群环境。
 
 
+# 其他
 
+## O_NONBLOCK
+
+### block
+
+- read：在有数据时返回，在没有数据时等待
+- write：在有足够的缓冲区存放数据时返回，不够则等待
+
+### non-block
+
+- read：在没有数据时返回-1
+- write：在缓冲区不够的情况下，返回能够缓存的字节数
+
+## FD_CLOEXEC
+
+用于表示fork的子进程在执行exec之前，将fd关闭（关闭文件描述符即不能对文件描述符指向的文件进行任何操作）
+
+## F_SETOWN
+
+指定进程或进程组在收到带外数据时接收SIGURG信号，或者当SOCK_STREAM连接意外断开后接收SIGPIPE信号。还可以通过SIGIO接收IO或异步消息
+
+## 遗留问题
+
+- 如何更好的理解domain, type, protocol的对应关系
+- 学习AF_PACKET的使用方法
+- 深入学习AF_NETLINK
+- 了解IPPROTO_TIPC
 
 
 
