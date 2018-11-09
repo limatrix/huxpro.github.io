@@ -113,7 +113,30 @@ TIPC:爱立信公司提出的一种透明进程间通信协议, 主要适用于�
 ## 遗留问题
 
 - 如何更好的理解domain, type, protocol的对应关系
-- 学习AF_PACKET的使用方法
+
+AF_UNIX unix_create
+SOCK_STREAM SOCK_RAW SOCK_DGRAM SOCK_SEQPACKET
+protocol 应该为 0 或者 PF_UNIX，但此参数没有用
+
+AF_PACKET packet_create
+SOCK_DGRAM SOCK_RAW SOCK_PACKET（已废弃）
+protocol 应为ETH_P_ALL ETH_P_IP等
+
+AF_NETLINK netlink_create
+SOCK_RAW SOCK_DGRAM
+protocol 应该小于MAX_LINKS 
+
+AF_INET
+SOCK_STREAM （IPPROTO_TCP IPPROTO_SCTP）
+SOCK_DGRAM  （IPPROTO_UDP）
+SOCK_RAW    （IPPROTO_ICMP IPPROTO_IGMP IPPROTO_TCP IPPROTO_UDP IPPROTO_SCTP IPPROTO_RAW）
+SOCK_SEQPACKET （IPPROTO_SCTP）
+SOCK_PACKET （IPPROTO_ICMP IPPROTO_IGMP IPPROTO_TCP IPPROTO_UDP IPPROTO_SCTP IPPROTO_RAW）（已废弃）
+
+domain表示网络通信的大类，比如AF_INET表示IPV4，AF_NETLINK则是完全不同的，用来在用户态和内核态通信
+type表示使用的通信方式
+protocol表示具体的协议（还是不清楚）
+
 - 深入学习AF_NETLINK
 - 了解IPPROTO_TIPC
 
