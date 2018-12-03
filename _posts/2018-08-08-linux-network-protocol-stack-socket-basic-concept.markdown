@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "LINUX 网络协议栈 - SOCKET基本概念"
+title:  "LINUX网络协议栈 - SOCKET基本概念"
 categories: linux
 author: 拾贝
 catalog: true
