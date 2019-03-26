@@ -167,3 +167,101 @@ static void run_ksoftirqd(unsigned int cpu)
 ```
 
 每次执行完__do_softirq都调用cond_resched，尽量不影响其他进程的执行。
+
+-- 其他
+软中断保留给系统中对时间要求最严格以及最重要的下半部使用。内核定时器和tasklet都是建立在软中断上的
+软中断处理程序执行的时候，允许响应中断，但它自己不能休眠。在一个处理程序运行的时候，当前处理器上的软中断被禁止。但其他的处理器仍可以执行别的软中断。实际上，如果同一个软中断在它被执行的同时再次被触发了，那么另一个处理器可以同时运行其处理程序。这意味着需要锁保护
+因此，大部分软中断处理程序，都通过采取单处理器数据（仅属于某一个处理器的数据，因此根本不需要加锁）或其他一些技巧来避免显式的加锁，从而提供更出色的性能
+tasklet本质也是软中断，只不过同一个处理程序的多个实例不能在多个处理器上同时运行
+在中断处理程序中触发软中断是最常见的形式
+一个软中断不会抢占另一个软中断，只有中断处理程序可以抢占软中断，其他的软中断可以在其他处理器上执行
+
+- tasklet
+
+tasklet是利用软中断实现的一种下半部机制。它和进程没有任何关系。它和软中断在本质上很相似，行为表现也很相近，但是，它的接口更简单，锁保护也要求低。
+
+tasklet由两类软中断代表：HI_SOFTIRQ和TASKLET_SOFTIRQ，HI_SOFTIRQ类型的软中断优先于TASKLET_SOFTIRQ类型的软中断执行。
+
+由于软中断必须使用可重入函数，这就导致设计上的复杂度变高，作为设备驱动程序的开发者来说，增加了负担。而如果某种应用并不需要在多个CPU上并行执行，那么软中断其实是没有必要的。因此诞生了弥补以上两个要求的tasklet。它具有以下特性： 
+a）一种特定类型的tasklet只能运行在一个CPU上，不能并行，只能串行执行。 
+b）多个不同类型的tasklet可以并行在多个CPU上。 
+c）软中断是静态分配的，在内核编译好之后，就不能改变。但tasklet就灵活许多，可以在运行时改变（比如添加模块时）。 
+tasklet是在两种软中断类型的基础上实现的，因此如果不需要软中断的并行特性，tasklet就是最好的选择。也就是说tasklet是软中断的一种特殊用法，即延迟情况下的串行执行。
+
+通过显式的调用tasklet_schedule()函数来触发tasklet执行。比如，802.11的接收中断处理函数ieee80211_rx_irqsafe中调用tasklet_schedule。
+
+```
+static inline void tasklet_schedule(struct tasklet_struct *t)
+{
+	if (!test_and_set_bit(TASKLET_STATE_SCHED, &t->state))
+		__tasklet_schedule(t);
+}
+```
+如果tasklet的状态不是TASKLET_STATE_SCHED，才会被调度
+```
+void __tasklet_schedule(struct tasklet_struct *t)
+{
+	unsigned long flags;
+
+	local_irq_save(flags);
+	t->next = NULL;
+	*__this_cpu_read(tasklet_vec.tail) = t;
+	__this_cpu_write(tasklet_vec.tail, &(t->next));
+	raise_softirq_irqoff(TASKLET_SOFTIRQ);
+	local_irq_restore(flags);
+}
+```
+将tasklet加入低优先级队列，触发软中断，进而调用wakeup_softirqd()
+```
+static void tasklet_action(struct softirq_action *a)
+{
+	struct tasklet_struct *list;
+
+	local_irq_disable();
+	list = __this_cpu_read(tasklet_vec.head);
+	__this_cpu_write(tasklet_vec.head, NULL);
+	__this_cpu_write(tasklet_vec.tail, &__get_cpu_var(tasklet_vec).head);
+	local_irq_enable();
+
+	while (list) {
+		struct tasklet_struct *t = list;
+
+		list = list->next;
+
+		if (tasklet_trylock(t)) {
+			if (!atomic_read(&t->count)) {
+				if (!test_and_clear_bit(TASKLET_STATE_SCHED, &t->state))
+					BUG();
+				t->func(t->data);
+				tasklet_unlock(t);
+				continue;
+			}
+			tasklet_unlock(t);
+		}
+
+		local_irq_disable();
+		t->next = NULL;
+		*__this_cpu_read(tasklet_vec.tail) = t;
+		__this_cpu_write(tasklet_vec.tail, &(t->next));
+		__raise_softirq_irqoff(TASKLET_SOFTIRQ);
+		local_irq_enable();
+	}
+}
+```
+
+- 循环遍历链表上的每一个待处理的tasklet
+- 如果是多处理器系统，通过检查TASKLET_STATE_RUN来判断这个tasklet是否在其他处理器上运行。如果它正在运行，那么现在就不要执行，跳到下一个待处理的tasklet上去
+- 如果当前这个tasklet没有执行，将其状态设置为TASKLET_STATE_RUN，这样，别的处理器就不会再去执行它了
+- 检查count值是否为0，确保tasklet没有被禁止，如果tasklet被禁止了，则跳到下一个tasklet上去
+
+softirq和tasklet的区别，在于允不允许在不同的处理器上能不能同时执行同一个处理程序
+
+- 工作队列
+
+工作队列是另外一种将工作推后执行的形式，它和我们前面讨论的所有其他形式都不相同。工作队列总是把工作交给一个内核线程去执行。这样，通过工作队列执行的代码能占尽进程上下文的所有优势。最重要的就是工作队列允许重新调度甚至睡眠。
+
+
+
+
+
+
