@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title></title>
+	<style type="text/css">
+		html, body {
+			height: 90%;
+			font-family: Arial;
+			font-size: 22px;
+		}
+	</style>
 </head>
-<body style="font-family: Arial, Microsoft YaHei; font-size: 30px;">
-
-	<div style="padding-left: 15px; padding-right: 15px; " >
-
-		<div style="" id="main-content">
-			
-		</div>
-
-		<div style="text-align: center;">
-			<button style="width: 30%;" id="first-button" onclick="displayFirstLine()">首页</button>
-			<button style="width: 30%;" id="pre-button" onclick="displayPreLine()">上页</button>
-			<button style="width: 30%;" id="next-button" onclick="displayNextLine()">下页</button>
-		</div>
-		
+<body>
+<div style="height: 100%;">
+	<div id="main-content" style="padding: 15px;">
 	</div>
 
+	<div style="width: 95%; text-align: center; bottom: 25px; position: fixed;">
+		<button style="width: 30%; height: 30px;" id="first-button" onclick="displayFirstLine()">首页</button>
+		<button style="width: 30%; height: 30px;" id="pre-button" onclick="displayPreLine()">上页</button>
+		<button style="width: 30%; height: 30px;" id="next-button" onclick="displayNextLine()">下页</button>
+	</div>
+</div>
 <div id="wait4process" style="display: none;">
-	进程是什么? 进程是程序实时运行的结果， 包括运行时的程序和各种资源的使用
+进程是什么? 进程是程序实时运行的结果， 包括运行时的程序和各种资源的使用
 线程是什么? 线程是比进程更轻量级的执行实体, 调度的基本单位, 有自己的栈和寄存器信息. 在LINUX下就是共享地址空间，共享文件等资源的进程，所以LINUX的线程是共享各种资源的进程
 进程的几种状态？
 TASK_RUNNING，正在运行或者等待运行
@@ -72,6 +77,7 @@ rq = task_rq_lock -> &per_cpu(runqueues, (cpu))
 
 </body>
 
+
 <script type="text/javascript">
 
 var text = document.getElementById("wait4process").innerText;
@@ -110,15 +116,7 @@ function displayNextLine() {
 	}
 }
 
-function initPageStyle() {
-	var height = document.body.scrollHeight;
-	maincontent.style.height = (height - 100) + "px";
-
-}
-
-initPageStyle();
 displayFirstLine();
-
 
 </script>
 </html>
