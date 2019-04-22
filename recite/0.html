@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body style="font-family: Arial, Microsoft YaHei; font-size: 30px;">
+
+	<div style="padding-left: 15px; padding-right: 15px; " >
+
+		<div style="" id="main-content">
+			
+		</div>
+
+		<div style="text-align: center;">
+			<button style="width: 30%;" id="first-button" onclick="displayFirstLine()">首页</button>
+			<button style="width: 30%;" id="pre-button" onclick="displayPreLine()">上页</button>
+			<button style="width: 30%;" id="next-button" onclick="displayNextLine()">下页</button>
+		</div>
+		
+	</div>
+
+<div id="wait4process" style="display: none;">
+	进程是什么? 进程是程序实时运行的结果， 包括运行时的程序和各种资源的使用
+线程是什么? 线程是比进程更轻量级的执行实体, 调度的基本单位, 有自己的栈和寄存器信息. 在LINUX下就是共享地址空间，共享文件等资源的进程，所以LINUX的线程是共享各种资源的进程
+进程的几种状态？
+TASK_RUNNING，正在运行或者等待运行
+TASK_INTERRUPTIBLE，睡眠，等待条件达成，可被信号唤醒
+TASK_UNINTERRUPTIBLE，睡眠，等待条件达成，不可被信号唤醒
+__TASK_TRACED，被跟踪调试
+__TASK_STOPPED, 没有运行，也不能被运行
+进程的创建
+调用clone() -> do_fork()
+fork函数复制父进程的页表和任务描述符，不复制整个地址空间，而采用写时拷贝页技术，在有写入的时候才拷贝
+vfork函数是在没有写时拷贝页的时候为了减少开销而写的函数，它不拷贝页表，也不拷贝地址空间，创建子进程后即阻塞，等待子进程退出或者调用exec后才开始执行
+内核代码中希望子进程先执行，因为绝大部分情况会调用exec执行新的程序，如果父进程先执行，可能会触发写时拷贝。然而事实上并不一定是子进程先执行
+exec函数创建地址空间，并载入程序
+进程的销毁
+进程将所有资源都是放后还是留着任务描述符，此时为僵死状态，需要等到父进程执行wait后，获取子进程的一些统计信息，才能完全释放
+还可以设置成不用等待父进程调用wait？
+父进程在子进程退出之前退出，需要给子进程重新找父进程
+如果特别多的子进程退出，但父进程没有调用wait，则会有大量内存得不到释放
+fork函数，在一个执行点上与子进程分开执行，返回两次
+exec创建地址空间并读取程序载入内存
+进程退出后为僵死进程，需要父进程调用wait系列函数才会彻底清除
+任务描述符在寄存器少的体系结构下，放在栈顶，栈的指针屏蔽低13位即可（栈为8192）。寄存器多的可直接放在寄存器中即可
+用户态程序通过系统调用陷入内核时，CURRENT宏有效，内核代码代表当前进程在内核态执行
+内核线程没有独立的地址空间，使用内核的地址空间
+问题
+为什么vfork的子进程里用return，整个程序会挂掉，而且exit()不会？
+vfork的工作流程
+保证子进程先执行
+当子进程调用exit()或exec()后，父进程往下执行
+起初只有fork，但是很多程序在fork一个子进程后就exec一个外部程序，于是fork需要copy父进程的数据这个动作就变得毫无意了，而且这样干还很重（还没有写时拷贝技术），所以，BSD搞出了个父子进程共享的 vfork，这样成本比较低。因此，vfork本就是为了exec而生。
+vfork的子进程同样使用父进程的栈空间，子进程调用return，相当于函数返回，会弹栈，相当于父进程的栈被破坏。而调用exit()就不会修改栈
+当前的fork除了多拷贝了页表和进程描述符，也不比vfork差什么，不建议用vfork
+为什么会产生僵尸进程?
+子进程退出时父进程没有调用wait、waitpid函数清除进程描述符
+编码时如何解决僵尸进程的问题？
+如果一个进程终止，而该进程有子进程处于僵尸状态，那么它的所有僵尸子进程的父进程ID将被重置为1（init进程）。继承这些子进程的init进程将清理它们(init进程将wait它们，从而去除僵尸状态)
+当子进程退出的时候，内核都会给父进程一个SIGCHLD信号。我们可以建立一个捕获SIGCHLD信号的信号处理函数，在函数体中调用wait（或waitpid），就可以清理退出的子进程以达到防止僵尸进程的目的。但如果在同一时刻终止多个子进程，就会产生多个SIGCHLD信号，而这个信号是不排队的，信号处理函数执行的次数可能会少于终止的子进程的数量
+正确的办法是循环调用waitpid，while( (pid = waitpid(-1, &stat, WNOHANG)) > 0 ) ，传入WNOHANG，它告知waitpid在有尚未终止的子进程在运行时不要阻塞
+为什么fork后子进程不一定先执行？
+子进程主要数据结构初始化完成后，需要根据任务调度类型，将任务挂到相应的运行队列上，以便有机会得到调度（wake_up_new_task()）
+调用set_task_cpu设置CPU，可能会给新任务选择一个其他的CPU，也可能还在当前CPU上
+调用调用activate_task，将任务挂到运行队列上
+调用check_preempt_curr检查新任务是否需要抢占当前（新任务所在的CPU、所在的队列正在执行的）任务，如果条件具备则将当前任务(rq->curr)调度出去
+set_task_cpu -> __set_task_cpu -> set_task_rq -> p->rt.rt_rq = task_group(p)->rt_rq[cpu]
+rq = task_rq_lock -> &per_cpu(runqueues, (cpu))
+从上面两行代码可以看到最终检查的rq其实是设置的cpu对应的rq
+无论是多CPU还是单CPU，最终执行check_preempt_curr检查是否执行新的任务，都不一定会先于父进程执行
+</div>
+
+</body>
+
+<script type="text/javascript">
+
+var text = document.getElementById("wait4process").innerText;
+var tmparray = text.split("\n");
+var textarray = [];
+
+for (var i = 0; i < tmparray.length; i++) {
+	if(tmparray[i] != "") {
+		var txt = tmparray[i].trim();
+		if(txt != "") {
+			textarray.push(txt);
+		}
+	}
+}
+
+var maincontent = document.getElementById("main-content");
+
+var currentpos = 0;
+
+function displayFirstLine() {
+	maincontent.innerText = textarray[0];
+	currentpos = 0;
+}
+
+function displayPreLine() {
+	if(currentpos > 0) {
+		currentpos--;
+		maincontent.innerText = textarray[currentpos];
+	}
+}
+
+function displayNextLine() {
+	if(currentpos <= (textarray.length - 1)) {
+		currentpos++;
+		maincontent.innerText = textarray[currentpos];
+	}
+}
+
+function initPageStyle() {
+	var height = document.body.scrollHeight;
+	maincontent.style.height = (height - 100) + "px";
+
+}
+
+initPageStyle();
+displayFirstLine();
+
+
+</script>
+</html>
