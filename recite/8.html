@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		html, body {
+			height: 90%;
+			font-family: Arial;
+			font-size: 22px;
+		}
+	</style>
+</head>
+<body>
+<div style="height: 100%;">
+	<div id="main-content" style="padding: 15px;">
+	</div>
+
+	<div style="width: 95%; text-align: center; bottom: 25px; position: fixed;">
+		<button style="width: 30%; height: 30px;" id="first-button" onclick="displayFirstLine()">首页</button>
+		<button style="width: 30%; height: 30px;" id="pre-button" onclick="displayPreLine()">上页</button>
+		<button style="width: 30%; height: 30px;" id="next-button" onclick="displayNextLine()">下页</button>
+	</div>
+</div>
+<div id="wait4process" style="display: none;">
+进程地址空间由进程可寻址的虚拟内存组成，内核允许进程使用这种虚拟内存中的地址
+现代采用虚拟内存的操作系统通常都使用平坦地址空间而不是分段式的内存模式
+内存区域包含的各种对象
+可执行文件代码的内存映射，成为代码段 - text section
+可执行文件的已初始化全局变量的内存映射，成为数据段 data section
+包含未初始化的全局变量，也就是bss段的零页的内存映射
+用于进程用户空间栈的零页内存映射
+每一个诸如C库或动态链接程序等共享库的代码段、数据段和bss也会被载入进程的地址空间
+任何内存映射文件
+任何共享内存段
+任何匿名的内存映射，比如由malloc()分配的内存
+BSS，因为未初始化的变量没有对应的值，所以并不需要存放在可执行文件中，但是C标准强制规定未初始化的全局变量要被赋予特殊的默认值0，所以内核要将变量从可行性代码载入到内存中，然后将零页映射到该片内存上，于是这些未初始化的变量就被赋予了0值，避免了在目标文件中显示地进行初始化，减少了空间浪费
+内核使用内存描述符结构体表示进程的地址空间，该结构体包含和进程地址空间有关的全部信息
+内核线程没有进程地址空间，也没有相关的内存描述符。所以内核线程对应的进程描述符中mm域为空。事实上，这也是内核线程的真实含义 - 他们没有用户上下文
+内核线程并不需要访问任何用户空间的内存，而且，因为内核线程在用户空间中没有任何页，所以实际上他们并不需要有自己的内存描述符和页表。尽管如此，即使访问内核内存，内核线程也还是需要使用页表的，它使用前 一个进程的内存描述符
+虚拟内存区域
+vm_area_struct结构体描述了指定地址空间内连续区间上的一个独立内存范围
+VMA标志，标志了内存区域所包含的页面的行为和信息，VMA标志反应了内核处理页面所需要遵守的行为准则
+VM_READ、VM_WRITE和VM_EXEC标志了内存区域中的读、写和执行权限
+VM_SHARED指明了内存区域包含的映射是否可以在多进程间共享
+VM_IO标志了内存区域中包含对设备IO空间的映射。该标志通常在设备驱动程序执行mmap函数进行IO空间映射时才被设置
+VM_RESERVED标志规定了内存区域不能被换出，它也是在设备驱动程序进行映射时被设置
+通过/proc/pid/maps 查看进程地址空间中全部区域 （待补充详细一点）
+mmap()和do_mmap()
+内核使用do_mmap()函数创建一个新的线性地址区间，并将地址区间加入到进程的地址空间中
+TLB，翻译后缓冲器，将虚拟地址映射到物理地址的硬件缓存，当请求访问一个虚拟地址时，处理器将首先检查TLB中是否缓存了该虚拟地址到物理地址的映射，如果在缓存中直接命中，物理地址立刻返回，否则就需要通过页表搜索到需要的物理地址
+</div>
+
+</body>
+
+<script src="./process.js "></script>
+</html>

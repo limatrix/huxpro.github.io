@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		html, body {
+			height: 90%;
+			font-family: Arial;
+			font-size: 22px;
+		}
+	</style>
+</head>
+<body>
+<div style="height: 100%;">
+	<div id="main-content" style="padding: 15px;">
+	</div>
+
+	<div style="width: 95%; text-align: center; bottom: 25px; position: fixed;">
+		<button style="width: 30%; height: 30px;" id="first-button" onclick="displayFirstLine()">首页</button>
+		<button style="width: 30%; height: 30px;" id="pre-button" onclick="displayPreLine()">上页</button>
+		<button style="width: 30%; height: 30px;" id="next-button" onclick="displayNextLine()">下页</button>
+	</div>
+</div>
+<div id="wait4process" style="display: none;">
+对调度程序中的运行队列进行平衡调整是基于定时器的
+HZ，节拍率，系统定时器频率是通过静态预定义的，在系统启动时按照HZ值对硬件进行设置
+jiffies，全局变量，用来记录自系统启动以来产生的节拍的总数
+jiffies类型为无符号长整型 unsigned long
+如何正确处理jiffies的溢出 time_after/time_before/time_after_eq/time_before_eq
+内核在时钟中断发生后执行定时器，定时器作为软中断在下半部上下文中执行
+udelay/ndelay/mdelay依靠循环延迟，内核知道处理器1秒能执行多少次循环
+BogoMIPS记录处理器在给定时间内忙循环执行的次数
+</div>
+
+</body>
+
+<script src="./process.js "></script>
+</html>

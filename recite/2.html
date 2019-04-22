@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		html, body {
+			height: 90%;
+			font-family: Arial;
+			font-size: 22px;
+		}
+	</style>
+</head>
+<body>
+<div style="height: 100%;">
+	<div id="main-content" style="padding: 15px;">
+	</div>
+
+	<div style="width: 95%; text-align: center; bottom: 25px; position: fixed;">
+		<button style="width: 30%; height: 30px;" id="first-button" onclick="displayFirstLine()">首页</button>
+		<button style="width: 30%; height: 30px;" id="pre-button" onclick="displayPreLine()">上页</button>
+		<button style="width: 30%; height: 30px;" id="next-button" onclick="displayNextLine()">下页</button>
+	</div>
+</div>
+<div id="wait4process" style="display: none;">
+系统调用所起到的作用
+系统调用在用户空间进程和硬件设备之间添加了一个中间层。它为用户空间提供了一种硬件的抽象接口。基于权限、访问控制，保证了系统的稳定和安全。
+系统调用是如何实现从用户态陷入内核的
+通知内核的机制是靠软中断实现的：通过引发一个异常来促使系统切换到内核态去执行异常处理程序，此时的异常处理程序实际上就是系统调用处理程序，在x86系统上使用int $0x80，即128号中断。
+系统调用和传参
+在x86上，系统调用号是通过eax寄存器传递给内核的。在陷入内核之前，用户空间就把相应系统调用对应的号放入eax中。
+通过ebx、ecx、edx、esi、edi按照顺序存放前5个参数，如果需要6个或以上参数，应该用一个单独的寄存器存放指向所有这些参数在用户空间地址的指针
+系统调用上下文
+内核在执行系统调用的时候处于进程上下文。current指针指向当前任务，即引发系统调用的任务
+系统调用允许抢占
+在进程上下文中，内核可以休眠，并且可以被抢占，系统调用应该是可重入的
+asmlinkage
+编译指令，通知编译器仅从栈中提取该函数的参数
+</div>
+
+</body>
+
+<script src="./process.js "></script>
+</html>

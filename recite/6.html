@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		html, body {
+			height: 90%;
+			font-family: Arial;
+			font-size: 22px;
+		}
+	</style>
+</head>
+<body>
+<div style="height: 100%;">
+	<div id="main-content" style="padding: 15px;">
+	</div>
+
+	<div style="width: 95%; text-align: center; bottom: 25px; position: fixed;">
+		<button style="width: 30%; height: 30px;" id="first-button" onclick="displayFirstLine()">首页</button>
+		<button style="width: 30%; height: 30px;" id="pre-button" onclick="displayPreLine()">上页</button>
+		<button style="width: 30%; height: 30px;" id="next-button" onclick="displayNextLine()">下页</button>
+	</div>
+</div>
+<div id="wait4process" style="display: none;">
+内核把物理页作为内存管理的基本单位
+MMU，管理内存并把虚拟地址转换为物理地址的硬件
+从虚拟内存的角度来看，页就是最小单位
+struct page
+flags域用来存放页的状态，包括页是不是脏的，是不是被锁定在内存中
+_count域存放页的引用计数
+virtual域是页的虚拟地址，通常情况下它就是页在虚拟内存中的地址
+高端内存并不永久的映射到内核地址空间上
+一些硬件只能用某些特定的内存地址来执行DMA
+一些体系结构的内存的物理地址寻址范围比虚拟寻址范围大得多。这样，就有一些内存不能永久地映射到内核空间上
+区
+ZONE_DMA，这个区包含的页能用来执行DMA操作
+ZONE_DMA32，这些页面只能被32位设备访问
+ZONE_NORMAL，这个区包含的都是能正常映射的页
+ZONE_HIGHMEM，这个区包含高端内存，其中的页并不能永久地映射到内核地址空间
+struct page * alloc_pages(gfp_t gfp_mask, unsigned int order) 分配2的order次方个连续的物理页
+void * page_address(struct page *page) 给定的页转换成逻辑地址
+unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order) 返回请求的第一个页的逻辑地址
+void * kmalloc(size_t size, gfp_t flags)，内存块至少有size大小
+只有alloc_pages才能分配高端内存
+gfp_mask
+GFP_ATOMIC，用在中断处理程序、下半部、持有自旋锁以及其他不能睡眠的地方
+GFP_KERNEL，常规分配方式，可能会阻塞，用在进程上下文中
+GFP_DMA，使用DMA的设备驱动程序使用这个标志
+调用kfree(NULL)是安全的
+vmalloc，分配的内存虚拟地址是连续的，而物理地址则无需连续
+由malloc返回的页在进程的虚拟地址空间内是连续的，但是，这并不保证他们在物理RAM中也是连续的
+物理地址/逻辑地址/虚拟地址？？
+物理地址，用于内存芯片级的单元寻址，与地址总线相对应
+逻辑地址，可以认为是cpu执行程序过程中的一种中间地址。Intel为了兼容，将远古时代的段式内存的管理方式保留了下来。一个逻辑地址，是由一个段标识符加上一个指定段内的相对地址的偏移量
+虚拟地址，用户态使用的连续的地址空间 ？？
+此部分待补充
+vmalloc函数为了把物理上不连续的页转换为虚拟地址空间上连续的页，必须专门建立页表项。通过vmalloc获得的页必须一个一个地进行映射，这会导致比直接内存映射大得多的TLB抖动
+当模块被动态插入到内核时，会把模块装载到由vmalloc分配的内存上
+slab分配器设计思想
+频繁使用的数据结构也会频繁分配和释放，因此应当缓存他们
+频繁分配和回收必然会导致内存碎片，使用提前分配好的内存，又不真正的释放，不会产生碎片
+对于频繁的分配和释放，空闲链表能够提高性能
+如果分配器知道对象大小、页大小和高速缓存的大小这样的概念，它会做出更明智的决策
+如果让部分缓存专属于单个处理器，那么，分配和释放就可以在不加SMP锁的情况下进行
+如果分配器是与NUMA相关的，他就可以从相同的内存节点(为当前CPU关联的内存)为请求者进行分配
+对存放的对象进行着色，以防止多个对象映射到相同的高速缓存行
+NUMA
+由于所有CPU Core都是通过共享一个北桥来读取内存，随着核数如何的发展，北桥在响应时间上的性能瓶颈越来越明显
+NUMA技术把内存控制器也做个拆分，平分到了每个CPU上
+只有当CPU访问自身直接attach内存对应的物理地址时，才会有较短的响应时间（后称Local Access）。而如果需要访问其他CPU attach的内存的数据时，就需要通过inter-connect通道访问，响应时间就相比之前变慢了（后称Remote Access）。所以NUMA（Non-Uniform Memory Access）就此得名
+Linux默认的内存分配方案就是：优先尝试在请求线程当前所处的CPU的Local内存上分配空间。如果local内存不足，优先淘汰local内存中无用的Page
+cache line ？？？
+此部分待补充
+根据定义，在高端内存中的页不能永久地映射到内核地址空间上。因此，通过alloc_pages()函数以__GFP_HIGHMEM标志获得的页不可能有逻辑地址
+在x86体系结构上，高于896MB的所有物理内存的范围大都是高端内存，它并不会永久地或自动地映射到内核地址空间。高端内存中的页被映射到3GB ~ 4GB
+高端内存概念的目的是留出内核的一部分地址空间用来有选择的映射内存的任意部分，使内核能够使用整个内存，而不是只有1个G的内存。。
+x86中32位体系结构中，linux把4G的线性地址空间分成两份，0-3G作为用户态程序的地址空间，3-4G作为内核的地址空间。我们说每一个用户态进程都应该有4G的地址空间可以用，然而内核的1G地址是所有用户态共享的。当我们把1G的内存全部一一映射到内核的1G地址上，那么内核想访问1G+1的位置怎么办，CPU当然能访问到这个位置，关键是内核根本给不了这个地址，它只有1G可用，这就限制了内核能使用多少内存，如果内核想访问更多的内存怎么办，留出一段的地址空间，(1024 - 896 )，注意首先是留出地址空间，而不是物理内存，当然这200多兆的内存也被留出来了，因为没有地方可以映射。留出来的地址空间内核可以用来映射物理高端内存(高于896M的内存)的任何地方，达到访问整个内存的目的。
+永久映射
+void *kmap(struct page *page) 映射一个给定的page结构到内核地址空间，这个函数在高端内存和低端内存上都能用。如果page结构对应的是低端内存中的一页，函数只会单纯的返回该页的虚拟地址。如果页位于高端内存，则会建立一个永久映射，再返回地址，应用在进程上下文中
+void kunmap(struct page *page) 当不再需要高端内存时，应该解除映射
+临时映射
+当必须创建一个映射而当前的上下文又不能睡眠时，内核提供了临时映射，即原子映射。有一组保留的映射，他们可以存放新创建的临时映射。内核可以原子地把高端捏存中的一个页映射到某个保留映射中
+kmap_atomic / kunmap_atomic
+使用每个CPU数据
+按照每个处理器访问每个CPU数据的逻辑，可以不再需要任何锁，获取每CPU数据时，内核接口同时会禁止内核抢占，就不会出现竞争
+使用每个CPU数据可以大大减少缓存失效（如果一个处理器操作某个数据，而该数据又存放在其他处理器缓存中，那么存放该数据的那个处理器必须清理或刷新自己的缓存。percpu接口缓存对齐所有数据，以便确保在访问一个处理器的数据时，不会将另一个处理器的数据带入同一个缓存线上）
+每个CPU数据在中断上下文或进程上下文中使用都很安全，但不能在访问每个CPU数据过程中睡眠，否则，当你醒过来已经到了其他处理器上了
+如果想从高端内存进行分配，就是用alloc_pages()，该函数返回一个指向struct page结构的指针，而不是一个指向某个逻辑地址的指针。因为高端内存很可能并没有映射
+</div>
+
+</body>
+
+<script src="./process.js "></script>
+</html>

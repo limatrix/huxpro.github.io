@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		html, body {
+			height: 90%;
+			font-family: Arial;
+			font-size: 22px;
+		}
+	</style>
+</head>
+<body>
+<div style="height: 100%;">
+	<div id="main-content" style="padding: 15px;">
+	</div>
+
+	<div style="width: 95%; text-align: center; bottom: 25px; position: fixed;">
+		<button style="width: 30%; height: 30px;" id="first-button" onclick="displayFirstLine()">首页</button>
+		<button style="width: 30%; height: 30px;" id="pre-button" onclick="displayPreLine()">上页</button>
+		<button style="width: 30%; height: 30px;" id="next-button" onclick="displayNextLine()">下页</button>
+	</div>
+</div>
+<div id="wait4process" style="display: none;">
+中断值被称为中断请求(IRQ)线。每个中断请求线都会被关联一个数值。
+IRQF_DISABLED， 内核在处理中断处理程序本身期间，要禁止所有其他的中断，如果不设置，中断处理程序可以与除本身外的其他任何中断同时运行。在2010年，实际Linux已经不再支持中断的嵌套, 也没有快慢中断的概念了，IRQF_DISABLED标记也作废了。
+LINUX中的中断处理程序是无须重入的。当一个给定的中断处理程序正在执行时，相应的中断线在所有处理器上都会被屏蔽掉，以防止在同一中断线上接收另一个新的中断。通常情况下，所有其他中断都是打开的。所以这些不同中断线上的其他中断都能被处理，但当前中断线总是被禁止的。
+do_IRQ()对所接收的中断进行应答，禁止这条线上的中断传递
+local_irq_save(flags)/local_irq_restore(flags) 禁止/恢复本地中断
+按键产生中断--》通过cpld汇聚上报--》通过gpio送达cpu--》送达pic响应--》由cpu核心响
+还有不通过CPLD，直接使用GPIO作为中断管脚的方式
+中断控制器的工作原理
+多个外部中断源共享中断资源，必须解决相应的一些问题，例如CPU芯片上只有一个INTR输入端，多个中断源如何与INTR连接、中断矢量如何区别、各中断源的优先级如何判定等。可编程中断控制器8259A就是为此目的而设计的，它可以接收多个外部中断源的中断请求，并进行优先级判断，选中当前优先级最高的中断请求，并将此请求送到CPU的INTR端。当CPU响应中断并进入中断服务程序的处理过程后，中断控制器仍负责对外部中断请求的管理。例如当某个外部中断请求的优先级高于当前正在处理的中断的优先级时，中断控制器会让它通过送到CPU的INTR端，从而实现中断嵌套。反之，对其他级别较低的中断则予以禁止。
+PCIE的中断类型及工作方式
+INTx
+PCI总线使用INTA#、INTB#、INTC#和INTD#信号向处理器发出中断请求。这些中断请求信号为低电平有效，并与处理器的中断控制器连接。在PCI体系结构中，这些中断信号属于边带信号（Sideband Signals）
+所谓边带信号是指这些信号在PCI总线中是可选信号，而且只能在一个处理器系统的内部使用，并不能离开这个处理器环境
+在一些嵌入式处理器系统中，这个问题较易解决。因为嵌入式处理器系统很清楚在当前系统中存在多少个PCI设备，这些PCI设备使用了哪些中断资源。在多数嵌入式处理器系统中，PCI设备的数量小于中断控制器提供的外部中断请求引脚数，而且在嵌入式系统中，多数PCI设备仅使用INTA#信号提交中断请求。
+在多数情况下，嵌入式处理器系统使用的PCI设备仅使用INTA#信号进行中断请求，所以只要将这些INTA#信号挂接到中断控制器的独立IRQ_PIN#引脚上即可。这样每一个PCI设备都可以独占一个单独的中断引脚。
+http://blog.chinaaet.com/justlxy/p/5100053096
+MSI
+cpu有一段特殊的寄存器空间，往这个寄存器里面写数据，就会触发cpu的中断。pci设备经过配置以后，一旦需要上报中断就会往cpu这种寄存器里面写一个值，触发cpu的中断。
+中断和异常的区别（什么叫与时钟同步）
+内部异常不可被屏蔽，一旦出现立马处理
+一般而言，中断是异步的，异常是同步的，所谓同步和异步的概念，又与我们网络通信或函数调用中的同步异步有所不同。中断是来自处理器外部的I/O设备的信号的结果，它不是由指令流中某条指令执行引起的，从这个意义上讲，它是异步的，是来自指令流之外的
+中断上下文和进程上下文的区别
+最主要的是不能睡眠，不能调度
+中断处理程序的同步问题
+Linux中的中断处理程序是无需重入的。当一个给定的中断处理程序正在执行时，相应的中断线在所有处理器上都会被屏蔽掉，以防止在同一中断线上接收另一个新的中断
+中断处理流程，从硬件到处理函数
+设备产生中断，通过总线把电信号发送给中断控制器，如果中断线是激活的，那么中断控制器就会把中断发往处理器，处理器会立即停止它正在做的事，关闭中断系统，然后跳到内存中预定义的位置，这个预定义的位置是中断处理程序的入口点
+对于每条中断线，处理器都会跳到对应的一个唯一的位置。 --- HOW？
+do_IRQ取出中断号，对所接收的中断进行应答，禁止这条线上的中断传递
+调用handle_IRQ_event()运行为这条中断线所安装的中断处理程序
+ret_from_intr() 检查是否设置了need_resched，如果被设置，而且内核正在返回用户空间，那么schedule()被调用。如果正在返回内核空间，只有在preempt_count为0时，schedule()才会被调用
+如何判断中断上下文、进程上下文
+in_interrupt
+in_irq
+可屏蔽中断
+常由计算机的外设或一些接口功能产生，如键盘、打印机、串行口等
+2. 这种类型的中断可以在CPU要处理其它紧急操作时，被软件屏蔽或忽略
+非屏蔽中断。
+1. 由意外事件导致，如电源断电、内存校验错误等
+2. 对于这种类型的中断事件，无法通过软件进行屏蔽，CPU必须无条件响应
+1. INTR接收可屏蔽中断请求
+2. NMI接收非屏蔽中断请求
+对于外部设备发出的中断请求，由全局中断控制器接收请求并决定交给CPU的哪一个核心处理。也可针对APIC编程，让所有的中断都被一个固定的CPU处理。
+相关函数
+local_irq_disable() / local_irq_enable()
+禁止/激活当前处理器上的本地中断，local_irq_enable会无条件的激活中断，即使这些中断开始时就是关闭的​
+local_irq_save() / local_irq_restore()
+禁止之前需要保存中断状态，恢复时可以和原来保持一致，这样会更加安全
+request_irq()
+-> request_threaded_irq() -> __setup_irq() __setup_irq是request_irq的核心部分，真正实现把 irqaction添加到irq_desc上面如果需要实现中断线程化，还需要创建一个内核线程，当中断来临时，整个中断线程会被唤醒，在线程环境去处理这个中断，减少上半部执行的时间，减轻中断上半部的压力。​
+</div>
+
+</body>
+
+<script src="./process.js "></script>
+</html>

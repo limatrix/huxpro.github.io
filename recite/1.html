@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		html, body {
+			height: 90%;
+			font-family: Arial;
+			font-size: 22px;
+		}
+	</style>
+</head>
+<body>
+<div style="height: 100%;">
+	<div id="main-content" style="padding: 15px;">
+	</div>
+
+	<div style="width: 95%; text-align: center; bottom: 25px; position: fixed;">
+		<button style="width: 30%; height: 30px;" id="first-button" onclick="displayFirstLine()">首页</button>
+		<button style="width: 30%; height: 30px;" id="pre-button" onclick="displayPreLine()">上页</button>
+		<button style="width: 30%; height: 30px;" id="next-button" onclick="displayNextLine()">下页</button>
+	</div>
+</div>
+<div id="wait4process" style="display: none;">
+抢占非抢占
+非抢占式内核是由任务主动放弃CPU的使用权
+使用调度器，高优先级的任务可以抢占低优先级的任务
+同时运行多个程序
+在单处理器上，通过进程切换执行，在一段时间内执行多个进程
+在多处理器上则可以真正的同时执行
+io消耗型和cpu消耗型
+io消耗型程序占用计算资源少，但希望更频繁更快的响应
+cpu消耗型则希望执行时间尽量长
+优先级和时间片
+通过给程序设定优先级来决定先调度哪些程序
+给程序时间片则可确定程序能执行多长时间
+NICE值
+类unix系统的标记优先级的方法
+切换上下文
+保存栈信息，寄存器信息，用于恢复进程执行
+调度器类
+进程抢占时机
+用户抢占
+内核即将返回用户空间的时候，如果need_resched标志被设置，会导致schedule()被调用，此时就会发生用户抢占。在内核返回用户空间的时候，它知道自己是安全的，因为既然它可以继续去执行当前进程，那么它当然可以再去选择一个新的进程去执行
+从系统调用返回用户空间时
+从中断处理程序返回用户空间时
+内核抢占
+只要没有持有锁，内核就可以进行抢占。从中断返回内核空间的时候，内核会检查need_resched和preempt_count的值。如果need_resched被设置，并且preempt_count(使用锁加1，释放锁减1)为0的话,这说明有一个更为重要的任务需要执行并且可以安全地抢占。如果当前进程持有的所有的锁都被释放了，preempt_count就会重新为0.此时，释放锁的代码会检查need_resched是否被设置，如果是的话，就会调用调度程序
+中断处理程序正在执行，且返回内核空间之前
+内核代码再一次具有可抢占性的时候
+如果内核中的任务显示地调用schedule()
+如果内核中有任务阻塞
+什么时候设置need_resched？
+时钟中断 update_process_times() -> scheduler_tick()
+唤醒一个进程 try_to_wake_up()
+完全公平调度算法
+采用非固定时间片，而是采用使用cpu资源的百分比，优先级高的程序百分比高。由于io消耗型程序每次使用的计算资源少，可能达不到给他的分配值，所以他总能被优先调度。cpu消耗型则可能由于使用的分配资源多，执行的次数反而少，被调度的优先级就低了。
+时间记账
+vruntime变量存放进程的虚拟运行时间。CFS使用vruntime变量来记录一个程序到底运行了多长时间以及它还应该再运行多久
+进程选择
+CFS选择一个vruntime最小的进程
+调度器入口
+schedule()
+睡眠和唤醒
+休眠通过等待队列进行处理。等待队列是由等待某些事件发生的进程组成的简单链表
+唤醒操作通过函数wake_up()进行，它会唤醒指定的等待队列上的所有进程。它调用函数try_to_wake_up()，该函数负责将进程设置为TASK_RUNNING状态，调用enqueue_task()将此进程放入红黑树中，如果被唤醒的进程优先级比当前正在执行的进程的优先级高，还要设置need_resched标志
+完全公平调度算法理解
+linuxperf.com/?p=42
+https://my.oschina.net/u/3857782/blog/1857561
+</div>
+
+</body>
+
+<script src="./process.js "></script>
+</html>
